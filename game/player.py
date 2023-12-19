@@ -1,8 +1,8 @@
 from random import random
 from typing import Union
-from components.actions import Treasury, Action
-from components.cards import CharacterCard, CourtDeck
-from components.errors import GameError
+from game.actions import Treasury, Action
+from game.cards import CharacterCard, CourtDeck
+from game.errors import GameError
 
 
 class Player(object):

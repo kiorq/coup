@@ -1,8 +1,8 @@
 from typing import Union
 from random import choice
 import typing
-from components.cards import AmbassadorCharacterCard, AssassinCharacterCard, CaptainCharacterCard, CharacterCard, ContessaCharacterCard, CourtDeck, DukeCharacterCard
-from components.errors import GameError
+from game.cards import AmbassadorCharacterCard, AssassinCharacterCard, CaptainCharacterCard, CharacterCard, ContessaCharacterCard, CourtDeck, DukeCharacterCard
+from game.errors import GameError
 
 
 
@@ -23,7 +23,7 @@ class Action(object):
     is_blockably_by: list[CharacterCard]
 
     if typing.TYPE_CHECKING:
-        from components.game import GameState
+        from game.game import GameState
         game_state: GameState # set by GameState when added
 
     def __init__(self, targeted_player_index: Union[int, None]) -> None:

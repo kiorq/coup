@@ -1,9 +1,9 @@
 from random import choice
 from flask import Flask, request, jsonify
-from components.errors import GameError
-from components.game_serializer import game_state_to_json
+from game.errors import GameError
+from game.game_serializer import game_state_to_json
 from app.services import load_game_state_clean, load_game_state_from_store, store_game_state
-from components.actions import ActionBlock, ActionChallenge, get_action_by_name, get_random_action
+from game.actions import ActionBlock, ActionChallenge, get_action_by_name, get_random_action
 
 
 app = Flask(__name__)

@@ -1,10 +1,10 @@
 
 from typing import Union
 
-from components.actions import Action, ActionBlock, ActionChallenge, Treasury
-from components.cards import CourtDeck
-from components.errors import GameError
-from components.player import Player
+from game.actions import Action, ActionBlock, ActionChallenge, Treasury
+from game.cards import CourtDeck
+from game.errors import GameError
+from game.player import Player
 
 
 class GameState(object):

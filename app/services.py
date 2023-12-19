@@ -1,7 +1,7 @@
 
 from app.db import persist_storage, retrieve_storage
-from components.game import GameState
-from components.game_serializer import game_state_from_json, game_state_to_json
+from game.game import GameState
+from game.game_serializer import game_state_from_json, game_state_to_json
 
 def load_game_state_from_store() -> GameState:
     """

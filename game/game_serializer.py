@@ -1,8 +1,8 @@
 from typing import Union
-from components.actions import Action, ActionBlock, ActionChallenge, Treasury, get_action_by_name
-from components.cards import CourtDeck, cards_from_names
-from components.player import Player
-from components.game import GameState
+from game.actions import Action, ActionBlock, ActionChallenge, Treasury, get_action_by_name
+from game.cards import CourtDeck, cards_from_names
+from game.player import Player
+from game.game import GameState
 
 
 def player_to_json(player_index, player: Player):
