@@ -9,7 +9,8 @@ def player_to_json(player_index, player: Player):
     return {
         "player_index": player_index,
         "coins": player.coins,
-        "cards": [card.character for card in player.cards]
+        "cards": [card.character for card in player.cards],
+        "revealed_cards": [card.character for card in player.revealed_cards]
     }
 
 
@@ -81,6 +82,7 @@ def game_state_from_json(data: dict) -> GameState:
         players = [Player(
             coins=player["coins"],
             cards=cards_from_names(player["cards"]),
+            revealed_cards=cards_from_names(player["revealed_cards"])
         ) for player in players_from_db]
 
     # challenge

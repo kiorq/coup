@@ -1,36 +1,57 @@
+
 from random import choice
-from flask import Flask, request, jsonify
-from game.errors import GameError
-from game.game_serializer import game_state_to_json
-from app.services import load_game_state_clean, load_game_state_from_store, store_game_state
+from typing import Union
 from game.actions import ActionBlock, ActionChallenge, get_action_by_name, get_random_action
+from game.errors import GameError
+from web.models.game import store_game_data, retrieve_game_data
+from game.game import GameState
+from game.game_serializer import game_state_from_json, game_state_to_json
+
+def load_game_state_from_store() -> GameState:
+    """
+        loads game staste from storage
+    """
+    return game_state_from_json(retrieve_game_data())
 
 
-app = Flask(__name__)
+def load_game_state_clean() -> GameState:
+    """
+        creates a fresh game state
+    """
+    return game_state_from_json({})
 
 
-@app.route("/", methods=["GET", "POST"])
-def home():
-    return {}
+def store_game_state(gs: GameState):
+    """
+        stores game state in storage
+    """
+    state = game_state_to_json(gs)
+    store_game_data(state)
+    return state
 
 
-@app.route("/state", methods=["GET"])
-def state():
+def game_current_state() -> dict:
+    """
+        retrieves game state
+    """
     game_state = load_game_state_from_store()
-    return jsonify(game_state_to_json(game_state))
+    return game_state_to_json(game_state)
 
 
-@app.route("/start_new", methods=["POST"])
-def start_new():
+def game_start_new():
+    """
+        starts game over
+    """
     game_state = load_game_state_clean()
 
     # store and return state
-    state = store_game_state(game_state)
-    return jsonify(state)
+    return store_game_state(game_state)
 
 
-@app.route("/perform_action", methods=["POST"])
-def perform_action():
+def game_perform_action(action_name: str, targeted_player_index: Union[int, None]) -> dict:
+    """
+        performs action on game state
+    """
     game_state = load_game_state_from_store()
 
     if game_state.current_player_index != 0:
@@ -39,32 +60,30 @@ def perform_action():
     if game_state.current_action:
         raise GameError("Action already being performed, may be challenged or blocked")
 
-    data = request.json
-
+    # make action
     action = get_action_by_name(
-        data.get("action"),
-        targeted_player_index=data.get("targeted_player_index", None)
+        action_name=action_name,
+        targeted_player_index=targeted_player_index
     )
 
     game_state.perform_action(action)
     game_state.try_to_complete_action()
 
     # store and return state
-    state = store_game_state(game_state)
-    return jsonify(state)
+    return store_game_state(game_state)
 
 
-@app.route("/next", methods=["POST"])
-def next():
+def automate_next_move():
     """
-        radomly chooses what other players do
+        automate the next move for the ai players
+        this is designed to be called step by step until
+        it is the human player's turn
     """
     game_state = load_game_state_from_store()
 
     if game_state.turn_ended:
         game_state.end_turn()
-        state = store_game_state(game_state)
-        return jsonify(state)
+        return store_game_state(game_state)
 
     if game_state.current_player_index == 0 and not game_state.turn_ended:
         raise GameError("Cannot skip your turn")
@@ -99,47 +118,37 @@ def next():
     game_state.try_to_complete_action()
 
     # store and return state
-    state = store_game_state(game_state)
-    return jsonify(state)
+    return store_game_state(game_state)
 
 
-@app.route("/respond_to_challenge", methods=["POST"])
-def respond_to_challenge():
+def respond_to_challenge(challenge_response: int):
+    """
+        allows human player to response to challenge (show or noshow)
+    """
     game_state = load_game_state_from_store()
 
     if not game_state.challenge or not game_state.challenge.is_undetermined:
         raise GameError("Not challenge to respond to")
 
-    data = request.json
-
-    challenge_response = data["challenge_response"]
     game_state.respond_to_challenge(challenge_response)
     game_state.try_to_complete_action()
     # store and return state
-    state = store_game_state(game_state)
-    return jsonify(state)
+    return store_game_state(game_state)
 
 
-@app.route("/respond_to_block", methods=["POST"])
-def respond_to_block():
+def respond_to_block(block_response: int):
+    """
+        allows human player to respond to block (ignore or challenge)
+    """
     game_state = load_game_state_from_store()
 
     if not game_state.block or not game_state.block.is_undetermined:
         raise GameError("No block to respond to")
 
-    data = request.json
-
-    block_response = data["block_response"]
     game_state.respond_to_block(
-        challenging_player_index=0,
+        challenging_player_index=0, # human player
         status=block_response
     )
     game_state.try_to_complete_action()
     # store and return state
-    state = store_game_state(game_state)
-    return jsonify(state)
-
-
-@app.errorhandler(GameError)
-def handle_game_error(e: GameError):
-    return jsonify({"error": str(e)}), 400
+    return store_game_state(game_state)
