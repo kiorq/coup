@@ -1,5 +1,5 @@
 from typing import Union
-from game.actions import Action, ActionBlock, ActionChallenge, Treasury, get_action_by_name
+from game.actions import AVAILABLE_ACTIONS, Action, ActionBlock, ActionChallenge, Treasury, get_action_by_name
 from game.cards import CourtDeck, cards_from_names
 from game.player import Player
 from game.game import GameState
@@ -44,6 +44,53 @@ def court_deck_to_json(court_deck: CourtDeck):
     return [card.character for card in court_deck.cards]
 
 
+def ui_status_text(game_state: GameState) -> str:
+    player_num = game_state.current_player_index + 1
+    if game_state.current_player_index == 0 and not game_state.current_action:
+        return "Your Turn. Choose an action!"
+
+    if not game_state.current_action:
+        return f"Player {player_num}'s turn"
+
+    if not game_state.challenge and not game_state.block:
+        return f"Player {player_num} Move: {game_state.current_action.action}!".title()
+
+    if game_state.challenge:
+        challening_player_num = game_state.challenge.challening_player_index + 1
+        if game_state.challenge.is_undetermined:
+            return f"Player {challening_player_num} challenged Player {player_num} 🚫"
+        if game_state.challenge.status == ActionChallenge.Status.Show:
+            return f"Player {player_num} revealed card 😮‍💨"
+        if game_state.challenge.status == ActionChallenge.Status.NoShow:
+            return f"Player {player_num} is bluffing 😫"
+
+    if game_state.block:
+        blocking_player_num = game_state.block.blocking_player_index + 1
+        if game_state.block.is_undetermined:
+            return f"Player {blocking_player_num} challenged Player {player_num} 🚫"
+        if game_state.block.status == ActionBlock.Status.Show:
+            return f"Player {player_num} revealed card 🚫"
+        if game_state.block.status == ActionBlock.Status.NoShow:
+            return f"Player {player_num} is bluffing 😂"
+
+    return "-"
+
+def ui_available_actions(game_state: GameState) -> list[dict]:
+    actions = []
+    if game_state.current_player_index == 0:
+        current_player = game_state.current_player
+
+        for action in AVAILABLE_ACTIONS.values():
+            will_be_bluffing = current_player.is_bluffing(action.required_influence) \
+                if action.required_influence else False
+            actions.append({
+                "action": action.action,
+                "will_be_bluffing": will_be_bluffing
+            })
+
+    return actions
+
+
 def game_state_to_json(game_state: GameState) -> dict:
     """ convers GameState to a json """
     return {
@@ -55,7 +102,11 @@ def game_state_to_json(game_state: GameState) -> dict:
         "treasury": game_state.treasury.coins,
         "court_deck": court_deck_to_json(game_state.court_deck),
         "turn_ended": game_state.turn_ended,
-        "winning_player_index": game_state.get_winning_player()
+        "winning_player_index": game_state.get_winning_player(),
+        "ui": {
+            "status_text": ui_status_text(game_state),
+            "available_actions": ui_available_actions(game_state)
+        }
     }
 
 

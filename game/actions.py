@@ -161,7 +161,7 @@ class StealAction(Action):
 
 
 # Mapping of action names to action classes
-AVAILABLE_ACTIONS = {
+AVAILABLE_ACTIONS: dict[str, type[Action]] = {
     "income": IncomeAction,
     "foreign_aid": ForeignAidAction,
     "coup": CoupAction,
