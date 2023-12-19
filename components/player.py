@@ -1,4 +1,5 @@
-
+from random import random
+from typing import Union
 from components.actions import Treasury, Action
 from components.cards import CharacterCard, CourtDeck
 from components.errors import GameError
@@ -42,18 +43,34 @@ class Player(object):
         court_deck.cards[:] = court_deck.cards[amount:]
 
     def request_challenge(self):
-        from random import random
         return random() < .40 # 40% probability
 
-    def is_bluffing(self, action: Action):
-        return action.required_influence not in self.cards
+    def request_block(self):
+        return True
+        return random() < .20 # 20% probability
+
+    def request_will_show(self):
+        """ will the player show card """
+        return True
+        return random() < .50 # 50% probability
+
+    def has_cards(self, cards: list[CharacterCard]):
+        for card in cards:
+            if card in self.cards:
+                return card
+        return None
+
+    def is_bluffing(self, card: CharacterCard):
+        """ check player could be bluffing (does not have card) """
+        return not bool(self.has_cards([card]))
 
     def loose_influence(self):
         self.revealed_cards.append(self.cards.pop())
 
-    def swap_cards(self, court_deck: CourtDeck, action: Action):
-        if action.required_influence:
-            card_index = self.cards.index(action.required_influence)
+    def swap_cards(self, court_deck: CourtDeck, card: Union[CharacterCard, None]):
+        # if action.required_influence:
+        if card:
+            card_index = self.cards.index(card)
             court_deck.add(self.cards[card_index])
             del self.cards[card_index]
             court_deck.shuffle()

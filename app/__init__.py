@@ -1,10 +1,9 @@
-
-import json
 from random import choice
-from components.errors import GameError
 from flask import Flask, request, jsonify
+from components.errors import GameError
+from components.game_serializer import game_state_to_json
 from app.services import load_game_state_clean, load_game_state_from_store, store_game_state
-from components.actions import ActionChallenge, get_action_by_name, get_random_action
+from components.actions import ActionBlock, ActionChallenge, get_action_by_name, get_random_action
 
 
 app = Flask(__name__)
@@ -18,7 +17,7 @@ def home():
 @app.route("/state", methods=["GET"])
 def state():
     game_state = load_game_state_from_store()
-    return jsonify(game_state.get_state())
+    return jsonify(game_state_to_json(game_state))
 
 
 @app.route("/start_new", methods=["POST"])
@@ -86,6 +85,17 @@ def next():
         ])
         game_state.respond_to_challenge(random_response)
 
+    # handle block
+    elif game_state.block and game_state.block.is_undetermined:
+        random_response = choice([
+            ActionBlock.Status.NoChallenge,
+            ActionBlock.Status.Challenge,
+        ])
+        game_state.respond_to_block(
+            challenging_player_index=game_state.current_player_index, # TODO: or get a random id
+            status=random_response
+        )
+
     game_state.try_to_complete_action()
 
     # store and return state
@@ -106,7 +116,26 @@ def respond_to_challenge():
     game_state.respond_to_challenge(challenge_response)
     game_state.try_to_complete_action()
     # store and return state
-    state = game_state.get_state()
+    state = store_game_state(game_state)
+    return jsonify(state)
+
+
+@app.route("/respond_to_block", methods=["POST"])
+def respond_to_block():
+    game_state = load_game_state_from_store()
+
+    if not game_state.block or not game_state.block.is_undetermined:
+        raise GameError("No block to respond to")
+
+    data = request.json
+
+    block_response = data["block_response"]
+    game_state.respond_to_block(
+        challenging_player_index=0,
+        status=block_response
+    )
+    game_state.try_to_complete_action()
+    # store and return state
     state = store_game_state(game_state)
     return jsonify(state)
 

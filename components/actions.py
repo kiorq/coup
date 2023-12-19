@@ -1,7 +1,7 @@
 from typing import Union
 from random import choice
 import typing
-from components.cards import AmbassadorCharacterCard, AssassinCharacterCard, CaptainCharacterCard, CharacterCard, CourtDeck, DukeCharacterCard
+from components.cards import AmbassadorCharacterCard, AssassinCharacterCard, CaptainCharacterCard, CharacterCard, ContessaCharacterCard, CourtDeck, DukeCharacterCard
 from components.errors import GameError
 
 
@@ -20,6 +20,7 @@ class Action(object):
     required_influence: Union[CharacterCard, None]
     action: str
     targeted_player_index: Union[int, None]
+    is_blockably_by: list[CharacterCard]
 
     if typing.TYPE_CHECKING:
         from components.game import GameState
@@ -41,15 +42,16 @@ class Action(object):
         """ will perform action """
         pass
 
-    def penalty(self):
+    def pay_penalty(self):
         """ penalty paid to perfrom action, regardless if bluffing or not """
-        return True
+        pass
 
 
 class IncomeAction(Action):
     """ Take 1 coin from the Treasury. """
     required_influence = None
     action = "income"
+    is_blockably_by = []
 
     def resolve(self):
         self.game_state.current_player.take_coins(
@@ -63,6 +65,7 @@ class ForeignAidAction(Action):
     """ Take 2 coins from the Treasury. """
     required_influence = None
     action = "foreign_aid"
+    is_blockably_by = [DukeCharacterCard()]
 
     def resolve(self):
         self.game_state.current_player.take_coins(
@@ -74,8 +77,9 @@ class ForeignAidAction(Action):
 class CoupAction(Action):
     required_influence = None
     action = "coup"
+    is_blockably_by = []
 
-    def penalty(self):
+    def pay_penalty(self):
         if self.game_state.current_player.coins >= 7:
             self.game_state.current_player.pay_coins(
                 treasury=self.game_state.treasury,
@@ -98,6 +102,7 @@ class TaxAction(Action):
     """ Take 3 coins from the Treasury. """
     required_influence = DukeCharacterCard()
     action = "tax"
+    is_blockably_by = [CaptainCharacterCard()]
 
     def resolve(self):
         self.game_state.current_player.take_coins(
@@ -110,8 +115,9 @@ class AssassinateAction(Action):
     """ Pays 3 coins to treasury and makes targeted player loose influence """
     required_influence = AssassinCharacterCard()
     action = "assassinate"
+    is_blockably_by = [ContessaCharacterCard()]
 
-    def penalty(self):
+    def pay_penalty(self):
         self.game_state.current_player.pay_coins(
             treasury=self.game_state.treasury,
             amount=3
@@ -128,6 +134,10 @@ class AssassinateAction(Action):
 class StealAction(Action):
     required_influence = CaptainCharacterCard()
     action = "steal"
+    is_blockably_by = [
+        CaptainCharacterCard(),
+        AmbassadorCharacterCard()
+    ]
 
     def resolve(self):
         targeted_player = self.get_targeted_player()
@@ -172,6 +182,10 @@ def get_random_action(**kwargs) -> Action:
     return choice(list(AVAILABLE_ACTIONS.values()))(**kwargs)
 
 class ActionChallenge(object):
+
+    challening_player_index: int
+    status: int
+
     class Status:
         Undetermined = 0
         NoShow = 1
@@ -179,6 +193,26 @@ class ActionChallenge(object):
 
     def __init__(self, challening_player_index: int, status = Status.Undetermined) -> None:
         self.challening_player_index = challening_player_index
+        self.status = status
+
+    @property
+    def is_undetermined(self):
+        return self.status == ActionChallenge.Status.Undetermined
+
+
+class ActionBlock(object):
+    blocking_player_index: int
+    status: int
+
+    class Status:
+        Undetermined = 0
+        Challenge = 1
+        NoChallenge = 2
+        NoShow = 3
+        Show = 4
+
+    def __init__(self, blocking_player_index: int, status = Status.Undetermined) -> None:
+        self.blocking_player_index = blocking_player_index
         self.status = status
 
     @property
