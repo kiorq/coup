@@ -91,6 +91,11 @@ def ui_available_actions(game_state: GameState) -> list[dict]:
     return actions
 
 
+def ui_should_automate(game_state: GameState) -> bool:
+    if game_state.current_player_index == 0 and game_state.turn_ended:
+        return True
+    return game_state.current_player_index != 0
+
 def game_state_to_json(game_state: GameState) -> dict:
     """ convers GameState to a json """
     return {
@@ -105,7 +110,8 @@ def game_state_to_json(game_state: GameState) -> dict:
         "winning_player_index": game_state.get_winning_player(),
         "ui": {
             "status_text": ui_status_text(game_state),
-            "available_actions": ui_available_actions(game_state)
+            "available_actions": ui_available_actions(game_state),
+            "should_automate": ui_should_automate(game_state)
         }
     }
 

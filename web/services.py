@@ -152,3 +152,14 @@ def respond_to_block(block_response: int):
     game_state.try_to_complete_action()
     # store and return state
     return store_game_state(game_state)
+
+
+def get_color_by_name_func(name: str):
+    CARD_COLOR_CLASS_MAP: dict[str, str] = {
+        "duke": "bg-purple-500",
+        "assassin": "bg-black !text-white",
+        "captain": "bg-blue-500",
+        "ambassador": "bg-gren-500",
+        "contessa": "bg-red-500"
+    }
+    return CARD_COLOR_CLASS_MAP.get(name)

@@ -15,12 +15,12 @@
                         <p class="text-center">🪙 {{ game_state.players[i].coins }} coins</p>
                         <div class="flex flex-row gap-3">
                             {% for card in game_state.players[i].cards %}
-                                <div class="w-full bg-slate-500 aspect-[9/10] rounded-2xl flex items-center justify-center">
+                                <div class="w-full bg-slate-500 aspect-[9/6] rounded-2xl flex items-center justify-center">
                                     <p class="font-medium">Faced down</p>
                                 </div>
                             {% endfor %}
                             {% for card in game_state.players[i].revealed_cards %}
-                                <div class="w-full {{ get_color_by_name_func(card) }} aspect-[9/10] rounded-2xl flex items-center justify-center opacity-70">
+                                <div class="w-full {{ get_color_by_name_func(card) }} aspect-[9/6] rounded-2xl flex items-center justify-center opacity-70">
                                     <p class="font-medium">{{ card.title() }}</p>
                                 </div>
                             {% endfor %}
@@ -37,12 +37,12 @@
                 <p class="text-center text-lg">🪙 {{ game_state.players[0].coins }} coins</p>
                 <div class="flex flex-row gap-3">
                     {% for card in game_state.players[0].cards %}
-                        <div class="w-full {{ get_color_by_name_func(card) }} aspect-[9/10] rounded-2xl flex items-center justify-center">
+                        <div class="w-full {{ get_color_by_name_func(card) }} aspect-[9/6] rounded-2xl flex items-center justify-center">
                             <p class="text-5xl font-bold">{{ card.title() }}</p>
                         </div>
                     {% endfor %}
                     {% for card in game_state.players[0].revealed_cards %}
-                        <div class="w-full {{ get_color_by_name_func(card) }} aspect-[9/10] rounded-2xl flex items-center justify-center opacity-70">
+                        <div class="w-full {{ get_color_by_name_func(card) }} aspect-[9/6] rounded-2xl flex items-center justify-center opacity-70">
                             <p class="text-5xl font-bold">{{ card.title() }}</p>
                         </div>
                     {% endfor %}
@@ -52,24 +52,36 @@
             <div class="w-full">
                 <p class="text-center text-3xl font-bold">{{ game_state.ui.status_text }}</p>
             </div>
-            <!-- actions -->
-            <form method="POST" class="w-full flex flex-row gap-3">
-                {% for action in game_state.ui.available_actions %}
+            {% if game_state.ui.should_automate %}
+                <!-- actions -->
+                <form method="POST" class="w-full">
                     <button type="submit"
-                            name="action"
-                            value="{{ action.action }}"
+                            name="automate_move"
+                            value="1"
                             class="w-full bg-slate-500 rounded-lg p-3">
-                        <p>{{ action.action }}</p>
-                        <p>
-                            {% if action.will_be_bluffing %}
-                                ⚠️
-                            {% else %}
-                                ✔️
-                            {% endif %}
-                        </p>
+                        <p>Automate Move Move</p>
                     </button>
-                {% endfor %}
-            </form>
+                </form>
+            {% else %}
+                <!-- actions -->
+                <form method="POST" class="w-full flex flex-row gap-3">
+                    {% for action in game_state.ui.available_actions %}
+                        <button type="submit"
+                                name="action"
+                                value="{{ action.action }}"
+                                class="w-full bg-slate-500 rounded-lg p-3">
+                            <p>{{ action.action }}</p>
+                            <p>
+                                {% if action.will_be_bluffing %}
+                                    ⚠️
+                                {% else %}
+                                    ✔️
+                                {% endif %}
+                            </p>
+                        </button>
+                    {% endfor %}
+                </form>
+            {% endif %}
         </div>
         <script src="https://cdn.tailwindcss.com"></script>
     </body>
