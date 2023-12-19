@@ -28,6 +28,12 @@ class GameState(object):
     def current_player(self):
         return self.players[self.current_player_index]
 
+    def get_winning_player(self):
+        active_players = [player for player in self.players if not player.is_exiled]
+        if len(active_players) == 1:
+            return self.players.index(active_players[0]) # absolutely horrible
+        return None
+
     def perform_action(self, action: Action):
         self.challenge = None
         self.current_action = action
@@ -157,5 +163,6 @@ class GameState(object):
             "challenge": challengeJson(self.challenge),
             "treasury": self.treasury.coins,
             "court_deck": courtDeckJson(self.court_deck),
-            "turn_ended": self.turn_ended
+            "turn_ended": self.turn_ended,
+            "winning_player_index": self.get_winning_player()
         }

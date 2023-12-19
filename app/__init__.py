@@ -74,10 +74,11 @@ def next():
 
     # handle challenge
     if game_state.challenge:
-        game_state.respond_to_challenge(choice([
+        random_response = choice([
             ActionChallenge.Status.NoShow,
             ActionChallenge.Status.Show,
-        ]))
+        ])
+        game_state.respond_to_challenge(random_response)
 
     game_state.try_to_complete_action()
 
@@ -102,5 +103,4 @@ def respond_to_challenge():
     state = game_state.get_state()
     state = store_game_state(game_state)
     return jsonify(state)
-
 
