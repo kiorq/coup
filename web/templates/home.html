@@ -10,7 +10,7 @@
             <!-- other players -->
             <div class="w-full flex flex-row gap-7">
                 {% for i in range(1, 4) %}
-                    <div class="w-full flex flex-col gap-3">
+                    <div class="w-full flex flex-col gap-3 {% if game_state.players[i].is_exiled %}opacity-50{% endif %}">
                         <p class="text-xl font-bold text-center">🤖 Player {{ i + 1 }}</p>
                         <p class="text-center">🪙 {{ game_state.players[i].coins }} coins</p>
                         <div class="flex flex-row gap-3">
@@ -25,7 +25,9 @@
                                 </div>
                             {% endfor %}
                         </div>
-                        {% if i == game_state.current_players_index %}
+                        {% if game_state.players[i].is_exiled %}
+                            <p class="font-semibold text-center bg-slate-500 rounded-lg p-1">👻 EXILED</p>
+                        {% elif i == game_state.current_players_index %}
                             <p class="font-semibold text-center bg-slate-500 rounded-lg p-1">🤖 PLAYING</p>
                         {% endif %}
                     </div>
@@ -42,7 +44,7 @@
                         </div>
                     {% endfor %}
                     {% for card in game_state.players[0].revealed_cards %}
-                        <div class="w-full {{ get_color_by_name_func(card) }} aspect-[9/6] rounded-2xl flex items-center justify-center opacity-70">
+                        <div class="w-full {{ get_color_by_name_func(card) }} aspect-[9/6] rounded-2xl flex items-center justify-center opacity-30">
                             <p class="text-5xl font-bold">{{ card.title() }}</p>
                         </div>
                     {% endfor %}
@@ -52,14 +54,55 @@
             <div class="w-full">
                 <p class="text-center text-3xl font-bold">{{ game_state.ui.status_text }}</p>
             </div>
-            {% if game_state.ui.should_automate %}
-                <!-- actions -->
+            {% if game_state.winning_player_index is not none %}
+                <form method="POST" class="w-full">
+                    <button type="submit"
+                            name="reset"
+                            value="1"
+                            class="w-full bg-slate-500 rounded-lg p-3">
+                        <input type="hidden"
+                               name="starting_player_index"
+                               value="{{ game_state.winning_player_index }}"/>
+                        <p>Start Over</p>
+                    </button>
+                </form>
+            {% elif game_state.ui.can_automate %}
                 <form method="POST" class="w-full">
                     <button type="submit"
                             name="automate_move"
                             value="1"
                             class="w-full bg-slate-500 rounded-lg p-3">
                         <p>Automate Move Move</p>
+                    </button>
+                </form>
+            {% elif game_state.challenge.is_undetermined %}
+                <form method="POST" class="w-full flex flex-row gap-3">
+                    <button type="submit"
+                            name="respond_to_challenge"
+                            value="show"
+                            class="w-full bg-slate-500 rounded-lg p-3">
+                        <p>Show Card</p>
+                    </button>
+                    <button type="submit"
+                            name="respond_to_challenge"
+                            value="noshow"
+                            class="w-full bg-slate-500 rounded-lg p-3">
+                        <p>Do Not Show Card</p>
+                    </button>
+                </form>
+            {% elif game_state.block.is_undetermined %}
+                <form method="POST" class="w-full flex flex-row gap-3">
+                    <button type="submit"
+                            name="respond_to_block"
+                            value="challenge"
+                            class="w-full bg-slate-500 rounded-lg p-3">
+                        <p>Challenge Block</p>
+                    </button>
+                    <button type="submit"
+                            name="respond_to_block"
+                            value="nochallenge"
+                            class="w-full bg-slate-500 rounded-lg p-3">
+                        <p>Do Not Challenge Block</p>
                     </button>
                 </form>
             {% else %}

@@ -10,7 +10,8 @@ def player_to_json(player_index, player: Player):
         "player_index": player_index,
         "coins": player.coins,
         "cards": [card.character for card in player.cards],
-        "revealed_cards": [card.character for card in player.revealed_cards]
+        "revealed_cards": [card.character for card in player.revealed_cards],
+        "is_exiled": player.is_exiled,
     }
 
 
@@ -27,6 +28,7 @@ def challenge_to_json(challenge: Union[ActionChallenge, None]):
     return {
         "challenging_player_index": challenge.challening_player_index,
         "status": challenge.status,
+        "is_undetermined": challenge.is_undetermined,
     }
 
 
@@ -37,6 +39,7 @@ def block_to_json(block: Union[ActionBlock, None]):
     return {
         "blocking_player_index": block.blocking_player_index,
         "status": block.status,
+        "is_undetermined": block.is_undetermined,
     }
 
 
@@ -46,6 +49,12 @@ def court_deck_to_json(court_deck: CourtDeck):
 
 def ui_status_text(game_state: GameState) -> str:
     player_num = game_state.current_player_index + 1
+
+    # check if we have a winner
+    winning_player_index = game_state.get_winning_player()
+    if winning_player_index is not None:
+        return f"Player {winning_player_index + 1}'s WINS 🎉"
+
     if game_state.current_player_index == 0 and not game_state.current_action:
         return "Your Turn. Choose an action!"
 
@@ -58,7 +67,7 @@ def ui_status_text(game_state: GameState) -> str:
     if game_state.challenge:
         challening_player_num = game_state.challenge.challening_player_index + 1
         if game_state.challenge.is_undetermined:
-            return f"Player {challening_player_num} challenged Player {player_num} 🚫"
+            return f"Player {challening_player_num} challenged Player {player_num} 🤨"
         if game_state.challenge.status == ActionChallenge.Status.Show:
             return f"Player {player_num} revealed card 😮‍💨"
         if game_state.challenge.status == ActionChallenge.Status.NoShow:
@@ -67,7 +76,7 @@ def ui_status_text(game_state: GameState) -> str:
     if game_state.block:
         blocking_player_num = game_state.block.blocking_player_index + 1
         if game_state.block.is_undetermined:
-            return f"Player {blocking_player_num} challenged Player {player_num} 🚫"
+            return f"Player {blocking_player_num} blocked Player {player_num} 🚫"
         if game_state.block.status == ActionBlock.Status.Show:
             return f"Player {player_num} revealed card 🚫"
         if game_state.block.status == ActionBlock.Status.NoShow:
@@ -111,7 +120,7 @@ def game_state_to_json(game_state: GameState) -> dict:
         "ui": {
             "status_text": ui_status_text(game_state),
             "available_actions": ui_available_actions(game_state),
-            "should_automate": ui_should_automate(game_state)
+            "can_automate": ui_should_automate(game_state)
         }
     }
 

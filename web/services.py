@@ -14,11 +14,13 @@ def load_game_state_from_store() -> GameState:
     return game_state_from_json(retrieve_game_data())
 
 
-def load_game_state_clean() -> GameState:
+def load_game_state_clean(current_players_index:int =0) -> GameState:
     """
         creates a fresh game state
     """
-    return game_state_from_json({})
+    return game_state_from_json({
+        "current_players_index": current_players_index
+    })
 
 
 def store_game_state(gs: GameState):
@@ -38,11 +40,11 @@ def game_current_state() -> dict:
     return game_state_to_json(game_state)
 
 
-def game_start_new():
+def game_start_new(current_players_index: int):
     """
         starts game over
     """
-    game_state = load_game_state_clean()
+    game_state = load_game_state_clean(current_players_index)
 
     # store and return state
     return store_game_state(game_state)
