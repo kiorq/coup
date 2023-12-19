@@ -1,5 +1,5 @@
 from typing import Union
-
+from random import choice
 from components.cards import AmbassadorCharacterCard, AssassinCharacterCard, CaptainCharacterCard, CharacterCard, CourtDeck, DukeCharacterCard
 
 
@@ -25,7 +25,7 @@ class IncomeAction(Action):
 
 class ForeignAidAction(Action):
     required_influence = None
-    action = "forieng_aid"
+    action = "foreign_aid"
 
 
 class CoupAction(Action):
@@ -69,6 +69,9 @@ def get_action_by_name(action_name: str) -> Action:
         raise Exception("Action %s does not exist" % action_name)
     return AVAILABLE_ACTIONS[action_name]()
 
+def get_random_action() -> Action:
+    """Retrieve an random action."""
+    return choice(list(AVAILABLE_ACTIONS.values()))()
 
 class ActionChallenge(object):
     class Status:

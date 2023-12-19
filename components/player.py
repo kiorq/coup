@@ -13,6 +13,10 @@ class Player(object):
         self.cards = cards
         self.revealed_cards = revealed_cards
 
+    @property
+    def is_exiled(self):
+        return len(self.cards) == 0
+
     def take_coins(self, treasury: Treasury, amount: int):
         """ takes coins from treasury """
         if treasury.coins < amount:
@@ -31,8 +35,7 @@ class Player(object):
 
     def request_challenge(self):
         from random import random
-        return True
-        return random() < .10 # 10% probability
+        return random() < .40 # 40% probability
 
     def is_bluffing(self, action: Action):
         return action.required_influence not in self.cards

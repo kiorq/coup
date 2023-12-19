@@ -13,32 +13,40 @@ class GameState(object):
     challenge: Union[ActionChallenge, None]
     treasury: Treasury
     court_deck: CourtDeck
+    turn_ended: bool
 
-    def __init__(self, current_player_index: int, players: list[Player], current_action: Union[Action, None], challenge: Union[ActionChallenge, None], treasury: Treasury, court_deck: CourtDeck):
+    def __init__(self, current_player_index: int, players: list[Player], current_action: Union[Action, None], challenge: Union[ActionChallenge, None], treasury: Treasury, court_deck: CourtDeck, turn_ended: bool):
         self.current_player_index = current_player_index
         self.players = players
         self.current_action = current_action
         self.challenge = challenge
         self.treasury = treasury
         self.court_deck = court_deck
+        self.turn_ended = turn_ended
 
     @property
     def current_player(self):
         return self.players[self.current_player_index]
 
     def perform_action(self, action: Action):
+        self.challenge = None
         self.current_action = action
 
     def end_turn(self):
         """
             resets game state for next turn
         """
+        self.turn_ended = False
         self.current_action = None
         self.challenge = None
         if self.current_player_index + 1 == len(self.players):
             self.current_player_index = 0
         else:
             self.current_player_index += 1
+
+        if self.players[self.current_player_index].is_exiled:
+            # this user cannot play
+            self.end_turn()
 
     def try_to_complete_action(self):
         """
@@ -47,6 +55,11 @@ class GameState(object):
         """
         if not self.current_action:
             raise Exception("Not action to complete")
+
+        # end turn
+        if self.turn_ended:
+            self.end_turn()
+            return
 
         # challenges
 
@@ -62,13 +75,13 @@ class GameState(object):
             if self.challenge.status == ActionChallenge.Status.NoShow:
                 # player did not show influencing character card
                 # end turn
-                self.end_turn()
+                self.turn_ended = True
                 return
 
         # blocks
 
         self.current_action.resolve()
-        self.end_turn()
+        self.turn_ended = True
         return
 
     def request_challenge(self):
@@ -79,6 +92,10 @@ class GameState(object):
             for player_index, player in enumerate(self.players):
                 if player_index == self.current_player_index:
                     # current player cannot challenge themself
+                    continue
+
+                if player.is_exiled:
+                    # user is can no longer play
                     continue
 
                 if player.request_challenge():
@@ -140,4 +157,5 @@ class GameState(object):
             "challenge": challengeJson(self.challenge),
             "treasury": self.treasury.coins,
             "court_deck": courtDeckJson(self.court_deck),
+            "turn_ended": self.turn_ended
         }

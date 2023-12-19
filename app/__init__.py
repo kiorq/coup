@@ -1,7 +1,9 @@
 
-from app.services import load_game_state_clean, load_game_state_from_store, store_game_state
-from components.actions import get_action_by_name
+from random import choice
 from flask import Flask, request, jsonify
+from app.services import load_game_state_clean, load_game_state_from_store, store_game_state
+from components.actions import ActionChallenge, get_action_by_name, get_random_action
+
 
 app = Flask(__name__)
 
@@ -50,6 +52,40 @@ def perform_action():
     return jsonify(state)
 
 
+@app.route("/next", methods=["POST"])
+def next():
+    """
+        radomly chooses what other players do
+    """
+    game_state = load_game_state_from_store()
+
+    if game_state.turn_ended:
+        game_state.end_turn()
+        state = store_game_state(game_state)
+        return jsonify(state)
+
+    if game_state.current_player_index == 0 and not game_state.turn_ended:
+        raise Exception("Cannot skip your turn")
+
+    # jandle selecting action
+    if not game_state.current_action:
+        action = get_random_action()
+        game_state.perform_action(action)
+
+    # handle challenge
+    if game_state.challenge:
+        game_state.respond_to_challenge(choice([
+            ActionChallenge.Status.NoShow,
+            ActionChallenge.Status.Show,
+        ]))
+
+    game_state.try_to_complete_action()
+
+    # store and return state
+    state = store_game_state(game_state)
+    return jsonify(state)
+
+
 @app.route("/respond_to_challenge", methods=["POST"])
 def respond_to_challenge():
     game_state = load_game_state_from_store()
@@ -66,4 +102,5 @@ def respond_to_challenge():
     state = game_state.get_state()
     state = store_game_state(game_state)
     return jsonify(state)
+
 

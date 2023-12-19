@@ -52,6 +52,7 @@ def load_game_state(data) -> GameState:
         challenge=challenge,
         treasury=treasury,
         court_deck=court_deck,
+        turn_ended=data.get("turn_ended") or False
     )
 
 def load_game_state_from_store() -> GameState:
