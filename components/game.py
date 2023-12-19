@@ -22,6 +22,10 @@ class GameState(object):
         self.treasury = treasury
         self.court_deck = court_deck
 
+    @property
+    def current_player(self):
+        return self.players[self.current_player_index]
+
     def perform_action(self, action: Action):
         self.current_action = action
 
@@ -30,6 +34,7 @@ class GameState(object):
             resets game state for next turn
         """
         self.current_action = None
+        self.challenge = None
         if self.current_player_index + 1 == len(self.players):
             self.current_player_index = 0
         else:
@@ -43,9 +48,24 @@ class GameState(object):
         if not self.current_action:
             raise Exception("Not action to complete")
 
+        # challenges
+
         if self.current_action.required_influence:
             if self.request_challenge():
                 return
+
+        if self.challenge:
+            if self.challenge.is_undetermined:
+                # cannot do anything until challenge is resolved
+                return
+
+            if self.challenge.status == ActionChallenge.Status.NoShow:
+                # player did not show influencing character card
+                # end turn
+                self.end_turn()
+                return
+
+        # blocks
 
         self.current_action.resolve()
         self.end_turn()
@@ -74,18 +94,20 @@ class GameState(object):
         if not self.challenge:
             raise Exception("No challenge to respond to")
 
-        if status == ActionChallenge.Status.Show:
-            self.challenge.status = ActionChallenge.Status.Show
-            # ActionChallenge.challening_player_index loses influence
-            # self.current_player_index swaps related card
-            return True
-            # we still need to run try_to_complete (another user could block)
-        elif status == ActionChallenge.Status.NoShow:
+        if not self.current_action:
+            raise Exception("No action being performed")
+
+        if self.current_player.is_bluffing(self.current_action) or status == ActionChallenge.Status.NoShow:
             self.challenge.status = ActionChallenge.Status.NoShow
-            # self.current_player_index looses influence
-            # cost returned to player
-            self.end_turn()
-            return False
+            self.current_player.loose_influence()
+            # TODO: cost returned to player
+
+        elif status == ActionChallenge.Status.Show:
+            challenging_player = self.players[self.challenge.challening_player_index]
+            self.challenge.status = ActionChallenge.Status.Show
+            self.current_player.swap_cards(self.court_deck, self.current_action)
+            challenging_player.loose_influence()
+            return
         else:
             raise Exception("Invalid response to challenge")
 

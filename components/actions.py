@@ -11,7 +11,7 @@ class Treasury(object):
 
 
 class Action(object):
-    required_influence: Union[type[CharacterCard], None]
+    required_influence: Union[CharacterCard, None]
     action: str
 
     def resolve(self):
@@ -33,22 +33,22 @@ class CoupAction(Action):
     action = "coup"
 
 class TaxAction(Action):
-    required_influence = DukeCharacterCard
+    required_influence = DukeCharacterCard()
     action = "tax"
 
 
 class AssassinateAction(Action):
-    required_influence = AssassinCharacterCard
+    required_influence = AssassinCharacterCard()
     action = "assassinate"
 
 
 class StealAction(Action):
-    required_influence = CaptainCharacterCard
+    required_influence = CaptainCharacterCard()
     action = "steal"
 
 
 class ExchangeAction(Action):
-    required_influence = AmbassadorCharacterCard
+    required_influence = AmbassadorCharacterCard()
     action = "exchange"
 
 
@@ -63,11 +63,11 @@ AVAILABLE_ACTIONS = {
     "exchange": ExchangeAction
 }
 
-def get_action_by_name(action_name: str):
+def get_action_by_name(action_name: str) -> Action:
     """Retrieve an action class by name."""
-    if action_name not in AVAILABLE_ACTIONS:
+    if action_name not in AVAILABLE_ACTIONS.keys():
         raise Exception("Action %s does not exist" % action_name)
-    return AVAILABLE_ACTIONS.get(action_name)
+    return AVAILABLE_ACTIONS[action_name]()
 
 
 class ActionChallenge(object):
@@ -79,3 +79,7 @@ class ActionChallenge(object):
     def __init__(self, challening_player_index: int, status = Status.Undetermined) -> None:
         self.challening_player_index = challening_player_index
         self.status = status
+
+    @property
+    def is_undetermined(self):
+        return self.status == ActionChallenge.Status.Undetermined

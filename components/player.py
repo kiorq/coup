@@ -1,12 +1,17 @@
 
-from components.actions import Treasury
+from components.actions import Treasury, Action
 from components.cards import CharacterCard, CourtDeck
 
 
 class Player(object):
-    def __init__(self, coins: int, cards: list[CharacterCard]):
+    coins: int
+    cards: list[CharacterCard]
+    revealed_cards: list[CharacterCard]
+
+    def __init__(self, coins: int, cards: list[CharacterCard], revealed_cards: list[CharacterCard] = []):
         self.coins = coins
         self.cards = cards
+        self.revealed_cards = revealed_cards
 
     def take_coins(self, treasury: Treasury, amount: int):
         """ takes coins from treasury """
@@ -26,4 +31,19 @@ class Player(object):
 
     def request_challenge(self):
         from random import random
+        return True
         return random() < .10 # 10% probability
+
+    def is_bluffing(self, action: Action):
+        return action.required_influence not in self.cards
+
+    def loose_influence(self):
+        self.revealed_cards.append(self.cards.pop())
+
+    def swap_cards(self, court_deck: CourtDeck, action: Action):
+        if action.required_influence:
+            card_index = self.cards.index(action.required_influence)
+            court_deck.add(self.cards[card_index])
+            del self.cards[card_index]
+            court_deck.shuffle()
+            self.take_cards(court_deck, amount=1)
