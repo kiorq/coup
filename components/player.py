@@ -1,6 +1,7 @@
 
 from components.actions import Treasury, Action
 from components.cards import CharacterCard, CourtDeck
+from components.errors import GameError
 
 
 class Player(object):
@@ -20,15 +21,22 @@ class Player(object):
     def take_coins(self, treasury: Treasury, amount: int):
         """ takes coins from treasury """
         if treasury.coins < amount:
-            raise Exception("Treasure has no more coins")
+            raise Treasury.TreasuryError("Treasure has no more coins")
 
         treasury.coins -=amount
         self.coins +=amount
 
+    def pay_coins(self, treasury: Treasury, amount: int):
+        if self.coins < amount:
+            raise Treasury.TreasuryError("Player does not have enough coins")
+
+        treasury.coins +=amount
+        self.coins -=amount
+
     def take_cards(self, court_deck: CourtDeck, amount: int):
         """ takes coins from treasury """
         if len(court_deck.cards) < amount:
-            raise Exception("Court deck has no more cards")
+            raise GameError("Court deck has no more cards")
 
         self.cards += court_deck.cards[:amount]
         court_deck.cards[:] = court_deck.cards[amount:]

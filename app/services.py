@@ -43,7 +43,7 @@ def load_game_state(data) -> GameState:
     current_action_from_db = data.get("current_action")
     current_action = None
     if current_action_from_db:
-        current_action = get_action_by_name(current_action_from_db)
+        current_action = get_action_by_name(current_action_from_db["action"], targeted_player_index=current_action_from_db["targeted_player_index"])
 
     return GameState(
         current_player_index=current_player_index,

@@ -3,6 +3,7 @@ from typing import Union
 
 from components.actions import Action, ActionChallenge, Treasury
 from components.cards import CourtDeck
+from components.errors import GameError
 from components.player import Player
 
 
@@ -19,6 +20,8 @@ class GameState(object):
         self.current_player_index = current_player_index
         self.players = players
         self.current_action = current_action
+        if self.current_action:
+            self.current_action.game_state = self
         self.challenge = challenge
         self.treasury = treasury
         self.court_deck = court_deck
@@ -28,13 +31,26 @@ class GameState(object):
     def current_player(self):
         return self.players[self.current_player_index]
 
+    def get_active_players(self):
+        return [player for player in self.players if not player.is_exiled]
+
+    def get_active_player_indexes(self):
+        return [player_index for player_index, player in enumerate(self.players) if not player.is_exiled]
+
     def get_winning_player(self):
-        active_players = [player for player in self.players if not player.is_exiled]
+        active_players = self.get_active_players()
         if len(active_players) == 1:
             return self.players.index(active_players[0]) # absolutely horrible
         return None
 
     def perform_action(self, action: Action):
+        # attempt to pay penalty first before setting current acction
+        try:
+            action.game_state = self
+            action.penalty() # execute penalty for action right away
+        except Treasury.TreasuryError:
+            raise
+        # set current action and reset challenge (if any)
         self.challenge = None
         self.current_action = action
 
@@ -60,7 +76,7 @@ class GameState(object):
             returns with action is resolved or turn has ended
         """
         if not self.current_action:
-            raise Exception("Not action to complete")
+            raise GameError("Not action to complete")
 
         # end turn
         if self.turn_ended:
@@ -115,15 +131,15 @@ class GameState(object):
 
     def respond_to_challenge(self, status: int):
         if not self.challenge:
-            raise Exception("No challenge to respond to")
+            raise GameError("No challenge to respond to")
 
         if not self.current_action:
-            raise Exception("No action being performed")
+            raise GameError("No action being performed")
 
         if self.current_player.is_bluffing(self.current_action) or status == ActionChallenge.Status.NoShow:
             self.challenge.status = ActionChallenge.Status.NoShow
             self.current_player.loose_influence()
-            # TODO: cost returned to player
+            # TODO: cost returned to player?
 
         elif status == ActionChallenge.Status.Show:
             challenging_player = self.players[self.challenge.challening_player_index]
@@ -132,7 +148,7 @@ class GameState(object):
             challenging_player.loose_influence()
             return
         else:
-            raise Exception("Invalid response to challenge")
+            raise GameError("Invalid response to challenge")
 
     def get_state(self):
         """ a state that front end will use to determine what to do next """
@@ -145,7 +161,7 @@ class GameState(object):
         def actionJson(action: Union[Action, None]):
             if not action:
                 return None
-            return action.action
+            return {"action": action.action, "targeted_player_index": action.targeted_player_index}
         def challengeJson(challenge: Union[ActionChallenge, None]):
             if not challenge:
                 return {}

@@ -1,5 +1,7 @@
 
+import json
 from random import choice
+from components.errors import GameError
 from flask import Flask, request, jsonify
 from app.services import load_game_state_clean, load_game_state_from_store, store_game_state
 from components.actions import ActionChallenge, get_action_by_name, get_random_action
@@ -33,15 +35,16 @@ def perform_action():
     game_state = load_game_state_from_store()
 
     if game_state.current_player_index != 0:
-        raise Exception("Not your turn")
+        raise GameError("Not your turn")
 
     if game_state.current_action:
-        raise Exception("Action already being performed, may be challenged or blocked")
+        raise GameError("Action already being performed, may be challenged or blocked")
 
     data = request.json
 
     action = get_action_by_name(
-        data.get("action")
+        data.get("action"),
+        targeted_player_index=data.get("targeted_player_index", None)
     )
 
     game_state.perform_action(action)
@@ -65,11 +68,14 @@ def next():
         return jsonify(state)
 
     if game_state.current_player_index == 0 and not game_state.turn_ended:
-        raise Exception("Cannot skip your turn")
+        raise GameError("Cannot skip your turn")
 
     # handle selecting action
     if not game_state.current_action:
-        action = get_random_action()
+        targeted_player_index = choice(game_state.get_active_player_indexes())
+        action = get_random_action(
+            targeted_player_index=targeted_player_index
+        )
         game_state.perform_action(action)
 
     # handle challenge
@@ -92,7 +98,7 @@ def respond_to_challenge():
     game_state = load_game_state_from_store()
 
     if not game_state.challenge or not game_state.challenge.is_undetermined:
-        raise Exception("Not challenge to respond to")
+        raise GameError("Not challenge to respond to")
 
     data = request.json
 
@@ -104,3 +110,7 @@ def respond_to_challenge():
     state = store_game_state(game_state)
     return jsonify(state)
 
+
+@app.errorhandler(GameError)
+def handle_game_error(e: GameError):
+    return jsonify({"error": str(e)}), 400
