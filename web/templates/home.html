@@ -14,8 +14,16 @@
                         <p class="text-xl font-bold text-center">🤖 Player {{ i + 1 }}</p>
                         <p class="text-center">🪙 {{ game_state.players[i].coins }} coins</p>
                         <div class="flex flex-row gap-3">
-                            <div class="w-full bg-slate-500 aspect-[9/10] rounded-lg"></div>
-                            <div class="w-full bg-slate-500 aspect-[9/10] rounded-lg"></div>
+                            {% for card in game_state.players[i].cards %}
+                                <div class="w-full bg-slate-500 aspect-[9/10] rounded-2xl flex items-center justify-center">
+                                    <p class="font-medium">Faced down</p>
+                                </div>
+                            {% endfor %}
+                            {% for card in game_state.players[i].revealed_cards %}
+                                <div class="w-full {{ get_color_by_name_func(card) }} aspect-[9/10] rounded-2xl flex items-center justify-center opacity-70">
+                                    <p class="font-medium">{{ card.title() }}</p>
+                                </div>
+                            {% endfor %}
                         </div>
                         {% if i == game_state.current_players_index %}
                             <p class="font-semibold text-center bg-slate-500 rounded-lg p-1">🤖 PLAYING</p>
@@ -29,12 +37,14 @@
                 <p class="text-center text-lg">🪙 {{ game_state.players[0].coins }} coins</p>
                 <div class="flex flex-row gap-3">
                     {% for card in game_state.players[0].cards %}
-                        <div class="w-full bg-slate-500 aspect-[9/10] rounded-2xl">
-                            <p>{{ card }}</p>
+                        <div class="w-full {{ get_color_by_name_func(card) }} aspect-[9/10] rounded-2xl flex items-center justify-center">
+                            <p class="text-5xl font-bold">{{ card.title() }}</p>
                         </div>
                     {% endfor %}
                     {% for card in game_state.players[0].revealed_cards %}
-                        <div class="w-full bg-slate-500 aspect-[9/10] rounded-2xl opacity-70"></div>
+                        <div class="w-full {{ get_color_by_name_func(card) }} aspect-[9/10] rounded-2xl flex items-center justify-center opacity-70">
+                            <p class="text-5xl font-bold">{{ card.title() }}</p>
+                        </div>
                     {% endfor %}
                 </div>
             </div>
