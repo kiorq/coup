@@ -17,7 +17,17 @@ class GameState(object):
     court_deck: CourtDeck
     turn_ended: bool
 
-    def __init__(self, current_player_index: int, players: list[Player], current_action: Union[Action, None], challenge: Union[ActionChallenge, None], block: Union[ActionBlock, None], treasury: Treasury, court_deck: CourtDeck, turn_ended: bool):
+    def __init__(
+        self,
+        current_player_index: int,
+        players: list[Player],
+        current_action: Union[Action, None],
+        challenge: Union[ActionChallenge, None],
+        block: Union[ActionBlock, None],
+        treasury: Treasury,
+        court_deck: CourtDeck,
+        turn_ended: bool,
+    ) -> None:
         self.current_player_index = current_player_index
         self.players = players
         self.current_action = current_action
@@ -156,6 +166,10 @@ class GameState(object):
         return False
 
     def respond_to_challenge(self, status: int):
+        """
+            allows a current player to respond to a challenge
+            on their current action
+        """
         if not self.challenge:
             raise GameError("No challenge to respond to")
 
@@ -203,6 +217,10 @@ class GameState(object):
             self.block = ActionBlock(-1, -1)
 
     def respond_to_block(self, challenging_player_index: int, status: int):
+        """
+            alows any player to respond block and can challenging it
+            once a block is challenged, the challenged response by the blocking player is automated
+        """
         if not self.block:
             raise GameError("No block to respond to")
 
