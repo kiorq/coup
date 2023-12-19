@@ -78,9 +78,9 @@ def ui_status_text(game_state: GameState) -> str:
         if game_state.block.is_undetermined:
             return f"Player {blocking_player_num} blocked Player {player_num} 🚫"
         if game_state.block.status == ActionBlock.Status.Show:
-            return f"Player {player_num} revealed card 🚫"
+            return f"Player {blocking_player_num} revealed card 🚫"
         if game_state.block.status == ActionBlock.Status.NoShow:
-            return f"Player {player_num} is bluffing 😂"
+            return f"Player {blocking_player_num} is bluffing 😂"
 
     return "-"
 

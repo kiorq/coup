@@ -91,12 +91,15 @@ def automate_next_move():
         raise GameError("Cannot skip your turn")
 
     # handle selecting action
+    targeted_player_index = choice(game_state.get_active_player_indexes())
+
     if not game_state.current_action:
         targeted_player_index = choice(game_state.get_active_player_indexes())
         action = get_random_action(
             targeted_player_index=targeted_player_index
         )
         game_state.perform_action(action)
+        return store_game_state(game_state)
 
     # handle challenge
     elif game_state.challenge and game_state.challenge.is_undetermined:
@@ -105,6 +108,7 @@ def automate_next_move():
             ActionChallenge.Status.Show,
         ])
         game_state.respond_to_challenge(random_response)
+        return store_game_state(game_state)
 
     # handle block
     elif game_state.block and game_state.block.is_undetermined:
@@ -116,6 +120,7 @@ def automate_next_move():
             challenging_player_index=game_state.current_player_index, # TODO: or get a random id
             status=random_response
         )
+        return store_game_state(game_state)
 
     game_state.try_to_complete_action()
 
