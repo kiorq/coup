@@ -67,13 +67,13 @@ def next():
     if game_state.current_player_index == 0 and not game_state.turn_ended:
         raise Exception("Cannot skip your turn")
 
-    # jandle selecting action
+    # handle selecting action
     if not game_state.current_action:
         action = get_random_action()
         game_state.perform_action(action)
 
     # handle challenge
-    if game_state.challenge:
+    elif game_state.challenge and game_state.challenge.is_undetermined:
         random_response = choice([
             ActionChallenge.Status.NoShow,
             ActionChallenge.Status.Show,
