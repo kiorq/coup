@@ -131,6 +131,11 @@ class GameState(object):
                 self.turn_ended = True
                 return
 
+            if self.block.status == ActionBlock.Status.NoShow:
+                # blocking player does not show
+                self.turn_ended = True
+                return
+
             if self.block.status == ActionBlock.Status.NoChallenge:
                 # does not want to challenge block
                 self.turn_ended = True

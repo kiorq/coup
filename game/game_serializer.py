@@ -60,9 +60,23 @@ def ui_status_text(game_state: GameState) -> str:
 
     if not game_state.current_action:
         return f"Player {player_num}'s turn"
+    
+    if game_state.turn_ended:
+        return f"Player {player_num} turn has ended"
 
     if not game_state.challenge and not game_state.block:
         return f"Player {player_num} Move: {game_state.current_action.action}!".title()
+    
+    if game_state.block:
+        blocking_player_num = game_state.block.blocking_player_index + 1
+        if game_state.block.is_undetermined:
+            return f"Player {blocking_player_num} blocked Player {player_num} 🚫"
+        if game_state.block.status == ActionBlock.Status.Show:
+            return f"Player {blocking_player_num} revealed card 🚫"
+        if game_state.block.status == ActionBlock.Status.NoShow:
+            return f"Player {blocking_player_num} is bluffing 😂"
+        elif game_state.block.status == ActionBlock.Status.NoChallenge:
+            return f"Block was not challenged"
 
     if game_state.challenge:
         challening_player_num = game_state.challenge.challening_player_index + 1
@@ -72,15 +86,6 @@ def ui_status_text(game_state: GameState) -> str:
             return f"Player {player_num} revealed card 😮‍💨"
         if game_state.challenge.status == ActionChallenge.Status.NoShow:
             return f"Player {player_num} is bluffing 😫"
-
-    if game_state.block:
-        blocking_player_num = game_state.block.blocking_player_index + 1
-        if game_state.block.is_undetermined:
-            return f"Player {blocking_player_num} blocked Player {player_num} 🚫"
-        if game_state.block.status == ActionBlock.Status.Show:
-            return f"Player {blocking_player_num} revealed card 🚫"
-        if game_state.block.status == ActionBlock.Status.NoShow:
-            return f"Player {blocking_player_num} is bluffing 😂"
 
     return "-"
 
