@@ -1,9 +1,10 @@
-from typing import Union
-from game.actions import AVAILABLE_ACTIONS, Action, ActionBlock, ActionChallenge, Treasury, get_action_by_name
-from game.cards import CourtDeck, cards_from_names
-from game.player import Player, PlayerWithAutomation
-from game.game import GameState
+"""
+    responsibile for providing data that makes it easier for the ui to know what to do
+"""
 
+from game.actions import AVAILABLE_ACTIONS, ActionBlock, ActionChallenge
+from game.game_state import GameState
+from web.services.game_state import load_game_state_from_store
 
 
 def ui_status_text(game_state: GameState) -> str:
@@ -92,3 +93,21 @@ def game_ui_state_json(game_state: GameState) -> dict:
         "can_block": ui_can_block(game_state)
     }
 
+
+def ui_current_state() -> dict:
+    """
+        retrieves ui state
+    """
+    game_state = load_game_state_from_store()
+    return game_ui_state_json(game_state)
+
+
+def get_color_by_name_func(name: str):
+    CARD_COLOR_CLASS_MAP: dict[str, str] = {
+        "duke": "bg-purple-500",
+        "assassin": "bg-black !text-white",
+        "captain": "bg-blue-500",
+        "ambassador": "bg-gren-500",
+        "contessa": "bg-red-500"
+    }
+    return CARD_COLOR_CLASS_MAP.get(name)

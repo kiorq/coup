@@ -1,7 +1,8 @@
 from flask import Blueprint, render_template, request
 from game.actions import ActionBlock, ActionChallenge
 from game.errors import GameError
-from web.services import automate_next_move, game_current_state, game_perform_action, game_start_new, get_color_by_name_func, respond_to_block, respond_to_challenge, ui_current_state
+from web.services.game_state import automate_next_move, block_action, challenge_action, game_current_state, game_perform_action, game_start_new, respond_to_block, respond_to_challenge
+from web.services.ui_state import get_color_by_name_func, ui_current_state
 
 page = Blueprint("main_page", __name__, "templates")
 
@@ -48,6 +49,16 @@ def home():
                         if respond_to_block_req == "challenge" \
                             else ActionBlock.Status.NoChallenge
                 )
+
+            # challenge another's player action
+            challenge_action_req = data.get("challenge_action")
+            if challenge_action_req:
+                game_state = challenge_action()
+
+            # block another's player action
+            block_action_req = data.get("block_action")
+            if block_action_req:
+                game_state = block_action()
 
             # automate next move (for other players)
             automate_move = data.get("automate_move")

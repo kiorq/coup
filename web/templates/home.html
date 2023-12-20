@@ -68,77 +68,93 @@
             <div class="w-full">
                 <p class="text-center text-3xl font-bold">{{ ui.status_text }}</p>
             </div>
-            {% if game_state.winning_player_index is not none %}
-                <form method="POST" class="w-full">
-                    <button type="submit"
-                            name="reset"
-                            value="1"
-                            class="w-full bg-slate-500 rounded-lg p-3">
-                        <input type="hidden"
-                               name="starting_player_index"
-                               value="{{ game_state.winning_player_index }}"/>
-                        <p>Start Over</p>
-                    </button>
-                </form>
-            {% elif ui.can_automate %}
-                <form method="POST" class="w-full">
-                    <button type="submit"
-                            name="automate_move"
-                            value="1"
-                            class="w-full bg-slate-500 rounded-lg p-3">
-                        <p>Automate Move Move</p>
-                    </button>
-                </form>
-            {% elif game_state.challenge.is_undetermined %}
-                <form method="POST" class="w-full flex flex-row gap-3">
-                    <button type="submit"
-                            name="respond_to_challenge"
-                            value="show"
-                            class="w-full bg-slate-500 rounded-lg p-3">
-                        <p>Show Card</p>
-                    </button>
-                    <button type="submit"
-                            name="respond_to_challenge"
-                            value="noshow"
-                            class="w-full bg-slate-500 rounded-lg p-3">
-                        <p>Do Not Show Card</p>
-                    </button>
-                </form>
-            {% elif game_state.block.is_undetermined %}
-                <form method="POST" class="w-full flex flex-row gap-3">
-                    <button type="submit"
-                            name="respond_to_block"
-                            value="challenge"
-                            class="w-full bg-slate-500 rounded-lg p-3">
-                        <p>Challenge Block</p>
-                    </button>
-                    <button type="submit"
-                            name="respond_to_block"
-                            value="nochallenge"
-                            class="w-full bg-slate-500 rounded-lg p-3">
-                        <p>Do Not Challenge Block</p>
-                    </button>
-                </form>
-            {% else %}
-                <!-- actions -->
-                <form method="POST" class="w-full flex flex-row gap-3">
-                    {% for action in ui.available_actions %}
+            <form method="POST">
+                {% if game_state.winning_player_index is not none %}
+                    <div class="w-full">
                         <button type="submit"
-                                name="action"
-                                value="{{ action.action }}"
+                                name="reset"
+                                value="1"
                                 class="w-full bg-slate-500 rounded-lg p-3">
-                            <p>{{ action.action }}</p>
-                            <p>
-                                {% if action.will_be_bluffing %}
-                                    ⚠️
-                                {% else %}
-                                    ✔️
-                                {% endif %}
-                            </p>
+                            <input type="hidden"
+                                   name="starting_player_index"
+                                   value="{{ game_state.winning_player_index }}"/>
+                            <p>Start Over</p>
                         </button>
-                    {% endfor %}
-                </form>
-            {% endif %}
+                    </div>
+                {% elif ui.can_automate %}
+                    <div class="w-full flex flex-row gap-3">
+                        {% if ui.can_block and ui.can_challenge %}
+                            <button type="submit"
+                                    name="block_action"
+                                    value="1"
+                                    class="w-full bg-slate-500 rounded-lg p-3">
+                                <p>Block Action</p>
+                            </button>
+                            <button type="submit"
+                                    name="challenge_action"
+                                    value="1"
+                                    class="w-full bg-slate-500 rounded-lg p-3">
+                                <p>Challenge Action</p>
+                            </button>
+                        {% endif %}
+                        <button type="submit"
+                                name="automate_move"
+                                value="1"
+                                class="w-full bg-slate-500 rounded-lg p-3">
+                            <p>Automate Move Move</p>
+                        </button>
+                    </div>
+                {% elif game_state.challenge.is_undetermined %}
+                    <div class="w-full flex flex-row gap-3">
+                        <button type="submit"
+                                name="respond_to_challenge"
+                                value="show"
+                                class="w-full bg-slate-500 rounded-lg p-3">
+                            <p>Show Card</p>
+                        </button>
+                        <button type="submit"
+                                name="respond_to_challenge"
+                                value="noshow"
+                                class="w-full bg-slate-500 rounded-lg p-3">
+                            <p>Do Not Show Card</p>
+                        </button>
+                    </div>
+                {% elif game_state.block.is_undetermined %}
+                    <div class="w-full flex flex-row gap-3">
+                        <button type="submit"
+                                name="respond_to_block"
+                                value="challenge"
+                                class="w-full bg-slate-500 rounded-lg p-3">
+                            <p>Challenge Block</p>
+                        </button>
+                        <button type="submit"
+                                name="respond_to_block"
+                                value="nochallenge"
+                                class="w-full bg-slate-500 rounded-lg p-3">
+                            <p>Do Not Challenge Block</p>
+                        </button>
+                    </div>
+                {% else %}
+                    <!-- actions -->
+                    <div class="w-full flex flex-row gap-3">
+                        {% for action in ui.available_actions %}
+                            <button type="submit"
+                                    name="action"
+                                    value="{{ action.action }}"
+                                    class="w-full bg-slate-500 rounded-lg p-3">
+                                <p>{{ action.action }}</p>
+                                <p>
+                                    {% if action.will_be_bluffing %}
+                                        ⚠️
+                                    {% else %}
+                                        ✔️
+                                    {% endif %}
+                                </p>
+                            </button>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </form>
         </div>
         <script src="https://cdn.tailwindcss.com"></script>
     </body>

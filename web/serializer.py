@@ -1,8 +1,11 @@
+"""
+    responsible to parsing game state to and from a dict
+"""
 from typing import Union
-from game.actions import AVAILABLE_ACTIONS, Action, ActionBlock, ActionChallenge, Treasury, get_action_by_name
+from game.actions import Action, ActionBlock, ActionChallenge, Treasury, get_action_by_name
 from game.cards import CourtDeck, cards_from_names
 from game.player import Player, PlayerWithAutomation
-from game.game import GameState
+from game.game_state import GameState
 
 
 def player_to_json(player_index, player: Player):

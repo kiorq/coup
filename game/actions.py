@@ -23,7 +23,7 @@ class Action(object):
     is_blockably_by: list[CharacterCard]
 
     if typing.TYPE_CHECKING:
-        from game.game import GameState
+        from game.game_state import GameState
         game_state: GameState # set by GameState when added
 
     def __init__(self, targeted_player_index: Union[int, None]) -> None:

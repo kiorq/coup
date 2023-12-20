@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify
-from web.services import game_current_state
+from web.services.game_state import game_current_state
 
 page = Blueprint("api_page", __name__, "templates")
 

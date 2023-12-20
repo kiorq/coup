@@ -2,11 +2,10 @@
 from random import choice
 from typing import Union
 from game.actions import ActionBlock, ActionChallenge, get_action_by_name
+from game.game_state import GameState
 from game.errors import GameError
-from game.ui import game_ui_state_json
 from web.models.game import store_game_data, retrieve_game_data
-from game.game import GameState
-from game.game_serializer import game_state_from_json, game_state_to_json
+from web.serializer import game_state_from_json, game_state_to_json
 
 def load_game_state_from_store() -> GameState:
     """
@@ -31,13 +30,6 @@ def store_game_state(gs: GameState):
     state = game_state_to_json(gs)
     store_game_data(state)
     return state
-
-def ui_current_state() -> dict:
-    """
-        retrieves ui state
-    """
-    game_state = load_game_state_from_store()
-    return game_ui_state_json(game_state)
 
 
 def game_current_state() -> dict:
@@ -106,19 +98,21 @@ def automate_next_move():
 
     # handle challenge
     elif game_state.challenge and game_state.challenge.is_undetermined:
-        random_response = choice([
-            ActionChallenge.Status.NoShow,
-            ActionChallenge.Status.Show,
-        ])
+        random_response = (
+            ActionChallenge.Status.Show
+            if game_state.current_player.request_will_show(game_state.current_action) 
+            else ActionChallenge.Status.NoShow
+        )
         game_state.respond_to_challenge(random_response)
         return store_game_state(game_state)
 
     # handle block
     elif game_state.block and game_state.block.is_undetermined:
-        random_response = choice([
-            ActionBlock.Status.NoChallenge,
-            ActionBlock.Status.Challenge,
-        ])
+        random_response = (
+            ActionBlock.Status.Challenge
+            if game_state.current_player.request_will_challenge_block(game_state.current_action) 
+            else ActionBlock.Status.NoChallenge
+        )
         game_state.respond_to_block(
             challenging_player_index=game_state.current_player_index, # TODO: or get a random id
             status=random_response
@@ -164,12 +158,28 @@ def respond_to_block(block_response: int):
     return store_game_state(game_state)
 
 
-def get_color_by_name_func(name: str):
-    CARD_COLOR_CLASS_MAP: dict[str, str] = {
-        "duke": "bg-purple-500",
-        "assassin": "bg-black !text-white",
-        "captain": "bg-blue-500",
-        "ambassador": "bg-gren-500",
-        "contessa": "bg-red-500"
-    }
-    return CARD_COLOR_CLASS_MAP.get(name)
+def challenge_action():
+    """ challenges another player's action """
+    game_state = load_game_state_from_store()
+
+    if game_state.challenge:
+        raise GameError("Action already challenged")
+
+    # set challenge as player 1
+    game_state.challenge_action(player_index=0)
+    game_state.try_to_complete_action()
+    # store and return state
+    return store_game_state(game_state)
+
+def block_action():
+    """ block another player's action"""
+    game_state = load_game_state_from_store()
+
+    if game_state.block:
+        raise GameError("Action already blocked")
+
+    # set challenge as player 1
+    game_state.block_action(player_index=0)
+    game_state.try_to_complete_action()
+    # store and return state
+    return store_game_state(game_state)

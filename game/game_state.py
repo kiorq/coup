@@ -156,6 +156,11 @@ class GameState(object):
         self.turn_ended = True
         return
 
+    def challenge_action(self, player_index: int):
+        self.challenge = ActionChallenge(
+            challening_player_index=player_index,
+        )
+
     def request_challenge(self):
         """
             asks each player if they want to challenge action
@@ -171,9 +176,7 @@ class GameState(object):
                     continue
 
                 if player.request_challenge(self.current_action):
-                    self.challenge = ActionChallenge(
-                        challening_player_index=player_index,
-                    )
+                    self.challenge_action(player_index)
                     return True
             # no one wanted to challenge
             self.challenge = ActionChallenge(-1, -1)
@@ -208,6 +211,11 @@ class GameState(object):
         else:
             raise GameError("Invalid response to challenge")
 
+    def block_action(self, player_index: int):
+        self.block = ActionBlock(
+            blocking_player_index=player_index,
+        )
+
     def request_block(self):
         """
             asks each player if they want to block action
@@ -223,9 +231,7 @@ class GameState(object):
                     continue
 
                 if player.request_block(self.current_action):
-                    self.block = ActionBlock(
-                        blocking_player_index=player_index,
-                    )
+                    self.block_action(player_index)
                     return True
 
             self.block = ActionBlock(-1, -1)
@@ -246,6 +252,7 @@ class GameState(object):
             # nothing happens, turn will end when we self.try_to_complete_action
 
         elif status == ActionBlock.Status.Challenge:
+            # messy
             blocking_player = self.players[self.block.blocking_player_index]
             blocking_player_card = blocking_player.has_cards(self.current_action.is_blockably_by)
             blocking_player_is_bluffing = not bool(blocking_player_card)

@@ -7,6 +7,14 @@ from game.ai_helpers import possible_next_actions, probability
 
 
 class Player(object):
+    """
+        Represents the state and actions of a player in the game.
+
+        Attributes:
+        - coins (int): The number of coins held by the player.
+        - cards (list[CharacterCard]): List of character cards held by the player.
+        - revealed_cards (list[CharacterCard]): List of revealed character cards, indicating lost influence.
+    """
     coins: int
     cards: list['cards.CharacterCard']
     revealed_cards: list['cards.CharacterCard']
@@ -59,6 +67,10 @@ class Player(object):
         # default, this will be handled by the ui
         return False
 
+    def request_will_challenge_block(self, action: actions.Action):
+        # default, this will be handled by the ui
+        return False
+
     def has_cards(self, cards: list['cards.CharacterCard']):
         for card in cards:
             if card in self.cards:
@@ -98,6 +110,10 @@ class PlayerWithAutomation(Player):
         return probability(.5) # could be changed as part of a game mode (easy, normal, hard)
 
     def request_will_show(self, action: actions.Action):
-        """ ask the player (who is blocking another) will show their influence """
+        """ ask the player will show their influence """
+        return probability(.5) # could be changed as part of a game mode (easy, normal, hard)
+
+    def request_will_challenge_block(self, action: actions.Action):
+        """ ask the player will challenge block """
         return probability(.5) # could be changed as part of a game mode (easy, normal, hard)
 
