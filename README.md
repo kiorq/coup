@@ -11,7 +11,7 @@
 
 ## How to Play
 
-First, you need to know how to play coup.
+First, you need to know [how to play coup](https://www.ultraboardgames.com/coup/game-rules.php).
 
 ### Layout
 
@@ -24,7 +24,7 @@ The UI's layout is organized into four invisible rows:
 
 **Other Players**
 
-The first row represents the other three players in the game (players 2-4). You can see how many coins they have and their facedown cards. Once revealed, their color and name will be exposed.
+The first row represents the other three players in the game (players 2-4). You can observe their coin count and facedown cards. Once revealed, their color and name will be exposed.
 
 A player labeled "👻 Exiled" has all their cards shown.
 
