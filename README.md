@@ -24,15 +24,15 @@ The UI's layout is organized into four invisible rows:
 
 **Other Players**
 
-The first row represents the other three players in the game (players 2-4). You can observe their coin count and facedown cards. Once revealed, their color and name will be exposed.
+The first row represents the other three players in the game (players 2-4). You can observe their coin count and facedown cards. Once revealed (lost influence), their color and name will be exposed.
 
-A player labeled "👻 Exiled" has all their cards shown.
+A player labeled "😵 EXILED" has all their cards revealed and will no longer participate in the game.
 
-When it's a player's turn, the label "🤖 Playing" will appear beneath them.
+When it's a player's turn, the label "🤖 PLAYING" will appear beneath them.
 
-**Player 1**
+**Player 1 (You)**
 
-Below the other players is your section, labeled "Player 1 (You)." You'll see the coins you have left and your two cards. These cards are always visible to you, and once revealed, their opacity will change.
+Below the other players is your section, labeled "Player 1 (You)." You'll see the coins you have left and your two cards. These cards are always visible to you, and once revealed (lost influence), their opacity will change making them more transparent.
 
 **Status and Action Bar**
 
@@ -50,6 +50,10 @@ During other player's turn, you'll see the button **🤖 Automate Next Move**, t
 
 This section displays the remaining coins in the treasury and the number of cards in the court dock.
 
+## Errors
+
+As much bugs and saftey checks were added as possible to prevent errors, however if any errors, you'll see an error message with a button that will reset the game if tapped
+
 ## Design and Architecture
 
 **Technology Stack:**
@@ -64,7 +68,7 @@ This section displays the remaining coins in the treasury and the number of card
 
 **Interaction Flow:**
 
-1. User clicks on an action button in the Action Bar on the frontend.
+1. User taps on an action button in the Action Bar on the frontend.
 2. Frontend sends a POST request to the backend.
 3. Backend analyzes the request, updating the state based on the specific action.
 4. Frontend reloads with the updated state, reflecting changes.
