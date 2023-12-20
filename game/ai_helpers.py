@@ -10,14 +10,17 @@ def probability(perc: float):
     return random() < perc
 
 def possible_next_actions(player: player.Player, players: list[player.Player]) -> list[actions.Action]:
-    """ determine next actions a player can take """
+    """
+        determine next possible actions a player can take, this determines
+        if the user has the coins or eligible targets for the actions
+    """
     possible_actions = []
 
     def player_is_not_exiled(player):
         return not player.is_exiled
 
     def add_to_possible_actions(actionCls: type[actions.Action], is_player_eligible_func: Union[Callable[[player.Player], bool], None]):
-        """ adds action to possible actions, if possible (e.g: there are elible target users) """
+        """ adds action to possible actions, if possible (e.g: there are eligible target users) """
         try:
             targeted_player_index = None
             if is_player_eligible_func:
@@ -27,7 +30,6 @@ def possible_next_actions(player: player.Player, players: list[player.Player]) -
         except EligiblePlayerNotFound:
             # can run action if they are no eligible players to perform the action on
             pass
-
 
     if player.coins >= 10:
         # 10 ore more coins, the player has to launch a cope
