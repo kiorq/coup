@@ -16,8 +16,8 @@ def possible_next_actions(player: player.Player, players: list[player.Player]) -
     """
     possible_actions = []
 
-    def player_is_not_exiled(player):
-        return not player.is_exiled
+    def player_is_not_exiled(p):
+        return not p.is_exiled and p is not player
 
     def add_to_possible_actions(actionCls: type[actions.Action], is_player_eligible_func: Union[Callable[[player.Player], bool], None]):
         """ adds action to possible actions, if possible (e.g: there are eligible target users) """
@@ -54,7 +54,7 @@ def possible_next_actions(player: player.Player, players: list[player.Player]) -
         add_to_possible_actions(actions.AssassinateAction, player_is_not_exiled)
 
     # steal
-    add_to_possible_actions(actions.StealAction, lambda player: not player.is_exiled and player.coins > 0)
+    add_to_possible_actions(actions.StealAction, lambda p: not p.is_exiled and p.coins > 0 and p is not player)
 
     return possible_actions
 

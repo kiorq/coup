@@ -3,6 +3,7 @@
 """
 
 from game.actions import AVAILABLE_ACTIONS, ActionBlock, ActionChallenge
+from game.ai_helpers import possible_next_actions
 from game.game_state import GameState
 from web.services.game_state import load_game_state_from_store
 
@@ -57,12 +58,14 @@ def ui_available_actions(game_state: GameState) -> list[dict]:
     if game_state.current_player_index == 0:
         current_player = game_state.current_player
 
-        for action in AVAILABLE_ACTIONS.values():
+        possible_actions = possible_next_actions(current_player, game_state.players)
+        for action in possible_actions:
             will_be_bluffing = current_player.is_bluffing(action.required_influence) \
                 if action.required_influence else False
             actions.append({
                 "action": action.action,
-                "will_be_bluffing": will_be_bluffing
+                "will_be_bluffing": will_be_bluffing,
+                "target_player_index": action.targeted_player_index
             })
 
     return actions
@@ -93,6 +96,10 @@ def ui_wait_for_player(game_state: GameState) -> bool:
         and not game_state.current_action \
         and not game_state.turn_ended
 
+
+def ui_is_player_1_exiled(game_state: GameState):
+    return game_state.players[0].is_exiled
+
 def game_ui_state_json(game_state: GameState) -> dict:
     """ convers GameState to a json """
     return {
@@ -103,7 +110,8 @@ def game_ui_state_json(game_state: GameState) -> dict:
         "turn_ended": game_state.turn_ended,
         "can_challenge": ui_can_challenge(game_state),
         "can_block": ui_can_block(game_state),
-        "wait_for_player": ui_wait_for_player(game_state)
+        "wait_for_player": ui_wait_for_player(game_state),
+        "is_player_1_exiled": ui_is_player_1_exiled(game_state)
     }
 
 

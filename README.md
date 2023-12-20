@@ -40,7 +40,7 @@ Below Player 1 is the status and action bar.
 
 The status updates you on what is happening in the game, including the start of a turn, performed actions, challenges, blocks, and the end of a turn or the winner.
 
-Under the status, buttons appear for the actions you can perform. Actions with the ✔️ emoji signify actions without bluffing, while those with the ⚠️ emoji involve bluffing.
+Under the status, buttons appear for the actions you can perform. Actions with the ✔️ emoji signify actions without bluffing, while those with the ⚠️ emoji involve bluffing. You only see actions that you can successfully perform (e.g: you have enough coins, or there are users with enough coins to steal)
 
 When challenged or blocked, you'll have options to respond accordingly.
 
@@ -99,3 +99,4 @@ A few things are missing from this design to keep it simple
 
 - The ability to exchange
 - The ability to respond to a challenge if you blocked another player's action 🤞
+- The ability to choose a target for an action

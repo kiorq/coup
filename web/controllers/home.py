@@ -26,10 +26,14 @@ def home():
 
             # perform action
             action_name_req = data.get("action")
+            target_player_index_req = data.get("target_player_index")
+            targeted_player_index = None if \
+                target_player_index_req == "None" or target_player_index_req is None \
+                    else int(target_player_index_req)
             if action_name_req:
                 game_state = game_perform_action(
                     action_name=action_name_req,
-                    targeted_player_index=None
+                    targeted_player_index=targeted_player_index,
                 )
 
             # respond to challenge
