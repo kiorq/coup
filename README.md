@@ -4,8 +4,8 @@
 
 ## Setup
 
-- Set up the Python environment (Python v3).
-- Install requirements: pip install -r requirements.txt
+- Set up the Python environment (Python v3) (I like to use `python3 -m venv .env`).
+- Install requirements: `pip install -r requirements.txt`
 - Run `flask --app web run --debug`
 - Visit http://127.0.0.1:5000 to view.
 
