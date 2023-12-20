@@ -1,9 +1,10 @@
 
 from random import choice
 from typing import Union
-from game.actions import ActionBlock, ActionChallenge, get_action_by_name
+from game.actions import ActionBlock, ActionChallenge
 from game.game_state import GameState
 from game.errors import GameError
+from game.helpers import get_action_by_name
 from web.models.game import store_game_data, retrieve_game_data
 from web.serializer import game_state_from_json, game_state_to_json
 

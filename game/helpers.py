@@ -1,13 +1,34 @@
 from __future__ import annotations
 from random import choice, random
 from typing import Callable, Union
-from game.errors import EligiblePlayerNotFound
+from game.errors import GameError, EligiblePlayerNotFound
 from game import actions
+from game import cards
 from game import player
+
+# Mapping of action names to action classes
+AVAILABLE_ACTIONS: dict[str, type[actions.Action]] = {
+    "income": actions.IncomeAction,
+    "foreign_aid": actions.ForeignAidAction,
+    "coup": actions.CoupAction,
+    "tax": actions.TaxAction,
+    "assassinate": actions.AssassinateAction,
+    "steal": actions.StealAction,
+    # "exchange": ExchangeAction
+}
+
+AVAILABLE_CARDS: dict[str, type[cards.CharacterCard]] = {
+    "duke": cards.DukeCharacterCard,
+    "assassin": cards.AssassinCharacterCard,
+    "captain": cards.CaptainCharacterCard,
+    "ambassador": cards.AmbassadorCharacterCard,
+    "contessa": cards.ContessaCharacterCard
+}
 
 
 def probability(perc: float):
     return random() < perc
+
 
 def possible_next_actions(player: player.Player, players: list[player.Player]) -> list[actions.Action]:
     """
@@ -65,3 +86,19 @@ def choose_eligible_player_index(is_player_eligible_func: Callable[[player.Playe
     if not eligible_player_indexes:
         raise EligiblePlayerNotFound("No players meet criteria")
     return choice(eligible_player_indexes)
+
+
+def get_action_by_name(action_name: str, **kwargs) -> actions.Action:
+    """Retrieve an action class by name."""
+    if action_name not in AVAILABLE_ACTIONS.keys():
+        raise GameError("Action %s does not exist" % action_name)
+    return AVAILABLE_ACTIONS[action_name](**kwargs)
+
+
+def cards_from_names(names: list[str]):
+    return [AVAILABLE_CARDS[name]() for name in names if name in AVAILABLE_CARDS.keys()]
+
+
+def default_card_list():
+    """ creates the default list of card, 3 cards for each character """
+    return cards_from_names(list(AVAILABLE_CARDS.keys()) * 3)

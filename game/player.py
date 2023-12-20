@@ -1,9 +1,10 @@
 from random import choice
 from typing import Union
+from game.treasury import Treasury
 from game import actions
 from game import cards
 from game.errors import GameError
-from game.ai_helpers import possible_next_actions, probability
+from game.helpers import possible_next_actions, probability
 
 
 class Player(object):
@@ -28,17 +29,17 @@ class Player(object):
     def is_exiled(self):
         return len(self.cards) == 0
 
-    def take_coins(self, treasury: actions.Treasury, amount: int):
+    def take_coins(self, treasury: Treasury, amount: int):
         """ takes coins from treasury """
         if treasury.coins < amount:
-            raise actions.Treasury.TreasuryError("Treasure has no more coins")
+            raise Treasury.TreasuryError("Treasure has no more coins")
 
         treasury.coins -=amount
         self.coins +=amount
 
-    def pay_coins(self, treasury: actions.Treasury, amount: int):
+    def pay_coins(self, treasury: Treasury, amount: int):
         if self.coins < amount:
-            raise actions.Treasury.TreasuryError("Player does not have enough coins")
+            raise Treasury.TreasuryError("Player does not have enough coins")
 
         treasury.coins +=amount
         self.coins -=amount

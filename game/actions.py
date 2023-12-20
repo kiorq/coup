@@ -5,22 +5,12 @@ from game.cards import AmbassadorCharacterCard, AssassinCharacterCard, CaptainCh
 from game.errors import GameError
 
 
-
-class Treasury(object):
-    coins = 0
-
-    class TreasuryError(GameError):
-        pass
-
-    def __init__(self, coins: int) -> None:
-        self.coins = coins
-
-
 class Action(object):
     required_influence: Union[CharacterCard, None]
     action: str
     targeted_player_index: Union[int, None]
     is_blockably_by: list[CharacterCard]
+    action_resolved: bool = False
 
     if typing.TYPE_CHECKING:
         from game.game_state import GameState
@@ -33,14 +23,19 @@ class Action(object):
         if self.targeted_player_index is not None:
             targeted_player = self.game_state.players[self.targeted_player_index]
             if targeted_player.is_exiled:
-                raise GameError("Cannot target exiled player")
+                raise GameError("Cannot target an exiled player")
             return targeted_player
 
         return None
 
     def resolve(self):
-        """ will perform action """
+        """ action logic once resolved """
         pass
+
+    def peform_action(self):
+        """ will perform action """
+        self.resolve()
+        self.action_resolved = True
 
     def pay_penalty(self):
         """ penalty paid to perfrom action, regardless if bluffing or not """
@@ -60,7 +55,6 @@ class IncomeAction(Action):
         )
 
 
-
 class ForeignAidAction(Action):
     """ Take 2 coins from the Treasury. """
     required_influence = None
@@ -75,6 +69,7 @@ class ForeignAidAction(Action):
 
 
 class CoupAction(Action):
+    """ Pays 7 coins to treasury and targeted player looses influence """
     required_influence = None
     action = "coup"
     is_blockably_by = []
@@ -129,6 +124,7 @@ class AssassinateAction(Action):
 
 
 class StealAction(Action):
+    """ Steals 2 (or 1) coins from targeted player """
     required_influence = CaptainCharacterCard()
     action = "steal"
     is_blockably_by = [
@@ -158,7 +154,7 @@ class StealAction(Action):
 
 
 class ActionChallenge(object):
-
+    """ represents a challenge against an action, used in GameState.challenge """
     challening_player_index: int
     status: int
 
@@ -177,6 +173,7 @@ class ActionChallenge(object):
 
 
 class ActionBlock(object):
+    """ represents a block against an action, used in GameState.block """
     blocking_player_index: int
     status: int
 
@@ -196,19 +193,3 @@ class ActionBlock(object):
         return self.status == ActionChallenge.Status.Undetermined
 
 
-# Mapping of action names to action classes
-AVAILABLE_ACTIONS: dict[str, type[Action]] = {
-    "income": IncomeAction,
-    "foreign_aid": ForeignAidAction,
-    "coup": CoupAction,
-    "tax": TaxAction,
-    "assassinate": AssassinateAction,
-    "steal": StealAction,
-    # "exchange": ExchangeAction
-}
-
-def get_action_by_name(action_name: str, **kwargs) -> Action:
-    """Retrieve an action class by name."""
-    if action_name not in AVAILABLE_ACTIONS.keys():
-        raise GameError("Action %s does not exist" % action_name)
-    return AVAILABLE_ACTIONS[action_name](**kwargs)

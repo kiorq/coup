@@ -2,8 +2,10 @@
     responsible to parsing game state to and from a dict
 """
 from typing import Union
-from game.actions import Action, ActionBlock, ActionChallenge, Treasury, get_action_by_name
-from game.cards import CourtDeck, cards_from_names
+from game.helpers import default_card_list, get_action_by_name, cards_from_names
+from game.treasury import Treasury
+from game.actions import Action, ActionBlock, ActionChallenge
+from game.cards import CourtDeck
 from game.player import Player, PlayerWithAutomation
 from game.game_state import GameState
 
@@ -79,7 +81,7 @@ def game_state_from_json(data: dict) -> GameState:
 
     court_deck_from_db = data.get("court_deck", {})
     court_deck_cards = court_deck_from_db.get("cards") or []
-    court_deck = CourtDeck(cards=cards_from_names(court_deck_cards))
+    court_deck = CourtDeck(cards=cards_from_names(court_deck_cards) or default_card_list())
 
     # players
     players_from_db = data.get("players")

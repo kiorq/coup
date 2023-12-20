@@ -2,8 +2,8 @@
     responsibile for providing data that makes it easier for the ui to know what to do
 """
 
-from game.actions import AVAILABLE_ACTIONS, ActionBlock, ActionChallenge
-from game.ai_helpers import possible_next_actions
+from game.actions import ActionBlock, ActionChallenge
+from game.helpers import possible_next_actions
 from game.game_state import GameState
 from web.services.game_state import load_game_state_from_store
 
@@ -16,14 +16,16 @@ def ui_status_text(game_state: GameState) -> str:
     if winning_player_index is not None:
         return f"Player {winning_player_index + 1}'s WINS 🎉"
 
-    if game_state.turn_ended:
-        return f"Player {player_num}'s turn ended 🎉"
-
     if game_state.current_player_index == 0 and not game_state.current_action:
         return "Your Turn. Choose an action!"
 
     if not game_state.current_action:
         return f"Player {player_num}'s turn"
+
+    if game_state.turn_ended:
+        if not game_state.current_action.action_resolved:
+            return f"Play {player_num}: {game_state.current_action.action} Successful 🎉".title()
+        return f"Player {player_num}'s turn ended"
 
     if not game_state.challenge and not game_state.block:
         against_text = ""
@@ -79,12 +81,12 @@ def ui_can_automate(game_state: GameState) -> bool:
 
 def ui_can_challenge(game_state: GameState) -> bool:
     return game_state.current_player_index != 0 \
-        and game_state.current_player \
+        and not game_state.current_player.is_exiled \
             and not game_state.challenge
 
 def ui_can_block(game_state: GameState) -> bool:
     return game_state.current_player_index != 0 \
-        and game_state.current_player \
+        and not game_state.current_player.is_exiled \
             and not game_state.block
 
 def ui_wait_for_player(game_state: GameState) -> bool:

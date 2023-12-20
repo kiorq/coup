@@ -1,10 +1,10 @@
 
 from typing import Union
-
-from game.actions import Action, ActionBlock, ActionChallenge, Treasury
+from game.actions import Action, ActionBlock, ActionChallenge
 from game.cards import CourtDeck
 from game.errors import GameError
 from game.player import Player
+from game.treasury import Treasury
 
 
 class GameState(object):
@@ -152,7 +152,7 @@ class GameState(object):
 
             # now we need to check if someone want to challenge the block
 
-        self.current_action.resolve()
+        self.current_action.peform_action()
         self.turn_ended = True
         return
 
