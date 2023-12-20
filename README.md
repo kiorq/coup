@@ -24,31 +24,31 @@ The UI's layout is organized into four invisible rows:
 
 **Other Players**
 
-The first row represents the other three players in the game (players 2-4). You can observe their coin count and facedown cards. Once revealed (lost influence), their color and name will be exposed.
+- The first row represents the other three players in the game (players 2-4). You can observe their coin count and facedown cards. Once revealed (lost influence), their color and name will be exposed.
 
-A player labeled "😵 EXILED" has all their cards revealed and will no longer participate in the game.
+- A player labeled "😵 EXILED" has all their cards revealed and will no longer participate in the game.
 
-When it's a player's turn, the label "🤖 PLAYING" will appear beneath them.
+- When it's a player's turn, the label "🤖 PLAYING" will appear beneath them.
 
 **Player 1 (You)**
 
-Below the other players is your section, labeled "Player 1 (You)." You'll see the coins you have left and your two cards. These cards are always visible to you, and once revealed (lost influence), their opacity will change making them more transparent.
+- Below the other players is your section, labeled "Player 1 (You)." You'll see the coins you have left and your two cards. These cards are always visible to you, and once revealed (lost influence), their opacity will change making them more transparent.
 
 **Status and Action Bar**
 
-Below Player 1 is the status and action bar.
+- Below Player 1 is the status and action bar.
 
-The status updates you on what is happening in the game, including the start of a turn, performed actions, challenges, blocks, and the end of a turn or the winner.
+- The status updates you on what is happening in the game, including the start of a turn, performed actions, challenges, blocks, and the end of a turn or the winner.
 
-Under the status, buttons appear for the actions you can perform. Actions with the ✔️ emoji signify actions without bluffing, while those with the ⚠️ emoji involve bluffing. You only see actions that you can successfully perform (e.g: you have enough coins, or there are users with enough coins to steal)
+- Under the status, buttons appear for the actions you can perform. Actions with the ✔️ emoji signify actions without bluffing, while those with the ⚠️ emoji involve bluffing. You only see actions that you can successfully perform (e.g: you have enough coins, or there are users with enough coins to steal)
 
-When challenged or blocked, you'll have options to respond accordingly.
+- When challenged or blocked, you'll have options to respond accordingly.
 
-During other player's turn, you'll see the button **🤖 Automate Next Move**, this is like a next button for the player's next move, each action is random.
+- During other player's turn, you'll see the button **🤖 Automate Next Move**, this is like a next button for the player's next move, each action is random.
 
 **Treasury and Court Dock**
 
-This section displays the remaining coins in the treasury and the number of cards in the court dock.
+- This section displays the remaining coins in the treasury and the number of cards in the court dock.
 
 ## Errors
 
