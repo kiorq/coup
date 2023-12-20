@@ -40,7 +40,7 @@ The UI's layout is organized into four invisible rows:
 
 - The status updates you on what is happening in the game, including the start of a turn, performed actions, challenges, blocks, and the end of a turn or the winner.
 
-- Under the status, buttons appear for the actions you can perform. Actions with the ✔️ emoji signify actions without bluffing, while those with the ⚠️ emoji involve bluffing. You only see actions that you can successfully perform (e.g: you have enough coins, or there are users with enough coins to steal)
+- Under the status, buttons appear for the actions you can perform. Actions with the ✔️ emoji signify actions without bluffing, while those with the ⚠️ emoji involve bluffing. You only see actions that you can successfully perform (e.g: you have enough coins for the penalty, or there are users with enough coins to steal)
 
 - When challenged or blocked, you'll have options to respond accordingly.
 
@@ -52,14 +52,14 @@ The UI's layout is organized into four invisible rows:
 
 ## Errors
 
-As much bugs and saftey checks were added as possible to prevent errors, however if any errors, you'll see an error message with a button that will reset the game if tapped
+As much bugs and saftey checks were added as possible to prevent errors, however if any errors, you'll see an error message at the top of the screen with a button that will reset the game if tapped
 
 ## Design and Architecture
 
 **Technology Stack:**
 
-- **Backend:** Flask
-- **Frontend:** HTML, Python (No JavaScript written, only tailwindcss cdn included)
+- **Backend:** Flask & Tinydb
+- **Frontend:** HTML, Python (very little js written, tailwindcss cdn included)
 
 **State Management:**
 
@@ -70,8 +70,8 @@ As much bugs and saftey checks were added as possible to prevent errors, however
 
 1. User taps on an action button in the Action Bar on the frontend.
 2. Frontend sends a POST request to the backend.
-3. Backend analyzes the request, updating the state based on the specific action.
-4. Frontend reloads with the updated state, reflecting changes.
+3. Backend updates the state based on the specific action.
+4. Frontend reloads with the updated state, reflecting visual changes.
 
 **State Observation:**
 
