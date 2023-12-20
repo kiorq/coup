@@ -3,6 +3,7 @@ from random import choice
 from typing import Union
 from game.actions import ActionBlock, ActionChallenge, get_action_by_name
 from game.errors import GameError
+from game.ui import game_ui_state_json
 from web.models.game import store_game_data, retrieve_game_data
 from game.game import GameState
 from game.game_serializer import game_state_from_json, game_state_to_json
@@ -37,7 +38,10 @@ def game_current_state() -> dict:
         retrieves game state
     """
     game_state = load_game_state_from_store()
-    return game_state_to_json(game_state)
+    return {
+        "game_state": game_state_to_json(game_state),
+        "ui": game_ui_state_json(game_state)
+    }
 
 
 def game_start_new(current_players_index: int):

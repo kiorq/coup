@@ -1,10 +1,9 @@
-from random import choice, random
+from random import choice
 from typing import Union
 from game import actions
 from game import cards
 from game.errors import GameError
 from game.ai_helpers import possible_next_actions, probability
-
 
 
 class Player(object):
@@ -92,13 +91,13 @@ class PlayerWithAutomation(Player):
 
     def request_challenge(self, action: actions.Action):
         """ ask player if they want to challenge """
-        return probability(.5)
+        return probability(.5) # could be changed as part of a game mode (easy, normal, hard)
 
     def request_block(self, action: actions.Action):
         """ ask player if they want to block """
-        return probability(.5)
+        return probability(.5) # could be changed as part of a game mode (easy, normal, hard)
 
-    def request_will_show(self):
+    def request_will_show(self, action: actions.Action):
         """ ask the player (who is blocking another) will show their influence """
-        return probability(.5)
+        return probability(.5) # could be changed as part of a game mode (easy, normal, hard)
 

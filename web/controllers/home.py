@@ -10,6 +10,8 @@ page = Blueprint("main_page", __name__, "templates")
 def home():
     # state = game_start_new()
     state = game_current_state()
+    game_state = state["game_state"]
+    ui = state["ui"]
     error_message = None
     if request.method == "POST":
         data = request.form
@@ -59,7 +61,8 @@ def home():
 
     return render_template(
         "home.html",
-        game_state=state,
+        game_state=game_state,
+        ui=ui,
         error_message=error_message,
         get_color_by_name_func=get_color_by_name_func
     )

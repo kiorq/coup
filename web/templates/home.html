@@ -66,7 +66,7 @@
             </div>
             <!-- status -->
             <div class="w-full">
-                <p class="text-center text-3xl font-bold">{{ game_state.ui.status_text }}</p>
+                <p class="text-center text-3xl font-bold">{{ ui.status_text }}</p>
             </div>
             {% if game_state.winning_player_index is not none %}
                 <form method="POST" class="w-full">
@@ -80,7 +80,7 @@
                         <p>Start Over</p>
                     </button>
                 </form>
-            {% elif game_state.ui.can_automate %}
+            {% elif ui.can_automate %}
                 <form method="POST" class="w-full">
                     <button type="submit"
                             name="automate_move"
@@ -122,7 +122,7 @@
             {% else %}
                 <!-- actions -->
                 <form method="POST" class="w-full flex flex-row gap-3">
-                    {% for action in game_state.ui.available_actions %}
+                    {% for action in ui.available_actions %}
                         <button type="submit"
                                 name="action"
                                 value="{{ action.action }}"
