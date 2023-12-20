@@ -8,6 +8,19 @@ from game.player import Player
 
 
 class GameState(object):
+    """
+        Represents the state of a game, including player information, current actions, and game progress.
+
+        Attributes:
+        - current_player_index (int): Index of the current player in the list of players.
+        - players (list[Player]): List of Player objects representing participants in the game.
+        - current_action (Union[Action, None]): Current Action being performed by current player, if any.
+        - challenge (Union[ActionChallenge, None]): Challenge associated with the current action, if any.
+        - block (Union[ActionBlock, None]): Block associated with the current action, if any.
+        - treasury (Treasury): Treasury object holding the coins left in the game.
+        - court_deck (CourtDeck): CourtDeck object representing the deck of cards in the game.
+        - turn_ended (bool): Flag indicating whether the current player's turn has ended.
+    """
     current_player_index: int
     players: list[Player]
     current_action: Union[Action, None]
