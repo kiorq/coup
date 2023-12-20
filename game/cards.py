@@ -42,6 +42,9 @@ class CourtDeck(object):
     def add(self, card: CharacterCard):
         self.cards.append(card)
 
+    def __len__(self):
+        return len(self.cards)
+
 
 AVAILABLE_CARDS: dict[str, type[CharacterCard]] = {
     "duke": DukeCharacterCard,

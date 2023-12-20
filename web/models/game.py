@@ -1,3 +1,4 @@
+from typing import Union
 from tinydb import TinyDB, where
 
 
@@ -10,6 +11,6 @@ def store_game_data(state: dict):
         db.upsert(state, where('key') == KEY)
 
 
-def retrieve_game_data():
+def retrieve_game_data() -> Union[dict, None]:
     with TinyDB('./db.json') as db:
         return db.get(where('key') == KEY)

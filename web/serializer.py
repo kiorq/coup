@@ -47,7 +47,10 @@ def block_to_json(block: Union[ActionBlock, None]):
 
 
 def court_deck_to_json(court_deck: CourtDeck):
-    return [card.character for card in court_deck.cards]
+    return {
+        "cards": [card.character for card in court_deck.cards],
+        "count": len(court_deck)
+    }
 
 
 
@@ -73,7 +76,10 @@ def game_state_from_json(data: dict) -> GameState:
     """
     current_player_index = data.get("current_players_index") or 0
     treasury = Treasury(coins=data.get("treasury") or 50)
-    court_deck = CourtDeck(cards=cards_from_names(data.get("court_deck") or []))
+
+    court_deck_from_db = data.get("court_deck", {})
+    court_deck_cards = court_deck_from_db.get("cards") or []
+    court_deck = CourtDeck(cards=cards_from_names(court_deck_cards))
 
     # players
     players_from_db = data.get("players")

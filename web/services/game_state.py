@@ -11,7 +11,7 @@ def load_game_state_from_store() -> GameState:
     """
         loads game staste from storage
     """
-    return game_state_from_json(retrieve_game_data())
+    return game_state_from_json(retrieve_game_data() or {})
 
 
 def load_game_state_clean(current_players_index:int =0) -> GameState:

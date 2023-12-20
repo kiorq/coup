@@ -107,7 +107,7 @@ def get_color_by_name_func(name: str):
         "duke": "bg-purple-500",
         "assassin": "bg-black !text-white",
         "captain": "bg-blue-500",
-        "ambassador": "bg-gren-500",
+        "ambassador": "bg-green-500",
         "contessa": "bg-red-500"
     }
     return CARD_COLOR_CLASS_MAP.get(name)
