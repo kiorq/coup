@@ -25,7 +25,10 @@ def ui_status_text(game_state: GameState) -> str:
         return f"Player {player_num}'s turn"
 
     if not game_state.challenge and not game_state.block:
-        return f"Player {player_num} Move: {game_state.current_action.action}!".title()
+        against_text = ""
+        if game_state.current_action.targeted_player_index is not None:
+            against_text = f" against Player {game_state.current_action.targeted_player_index + 1}"
+        return f"Player {player_num}: {game_state.current_action.action}{against_text}!".title()
 
     if game_state.block:
         blocking_player_num = game_state.block.blocking_player_index + 1
@@ -81,16 +84,26 @@ def ui_can_block(game_state: GameState) -> bool:
         and game_state.current_player \
             and not game_state.block
 
+def ui_wait_for_player(game_state: GameState) -> bool:
+    """
+        this will be true when it's a player's turn and they haven't performed an action yet
+        the ui will use this to automate the wait using js
+    """
+    return game_state.current_player_index != 0 \
+        and not game_state.current_action \
+        and not game_state.turn_ended
 
 def game_ui_state_json(game_state: GameState) -> dict:
     """ convers GameState to a json """
     return {
+        "current_player_num": game_state.current_player_index + 1,
         "status_text": ui_status_text(game_state),
         "available_actions": ui_available_actions(game_state),
         "can_automate": ui_can_automate(game_state),
         "turn_ended": game_state.turn_ended,
         "can_challenge": ui_can_challenge(game_state),
-        "can_block": ui_can_block(game_state)
+        "can_block": ui_can_block(game_state),
+        "wait_for_player": ui_wait_for_player(game_state)
     }
 
 

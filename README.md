@@ -44,6 +44,8 @@ Under the status, buttons appear for the actions you can perform. Actions with t
 
 When challenged or blocked, you'll have options to respond accordingly.
 
+During other player's turn, you'll see the button **🤖 Automate Next Move**, this is like a next button for the player's next move, each action is random.
+
 **Treasury and Court Dock**
 
 This section displays the remaining coins in the treasury and the number of cards in the court dock.
@@ -90,3 +92,10 @@ This section displays the remaining coins in the treasury and the number of card
 
 - `game` directory houses core game logic.
 - `web` directory implements a Model-View-Controller (MVC) Flask setup, and interaction with game logic.
+
+## Things that are missing
+
+A few things are missing from this design to keep it simple
+
+- The ability to exchange
+- The ability to respond to a challenge if you blocked another player's action 🤞
