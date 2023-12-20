@@ -32,16 +32,20 @@ def store_game_state(gs: GameState):
     store_game_data(state)
     return state
 
+def ui_current_state() -> dict:
+    """
+        retrieves ui state
+    """
+    game_state = load_game_state_from_store()
+    return game_ui_state_json(game_state)
+
 
 def game_current_state() -> dict:
     """
         retrieves game state
     """
     game_state = load_game_state_from_store()
-    return {
-        "game_state": game_state_to_json(game_state),
-        "ui": game_ui_state_json(game_state)
-    }
+    return game_state_to_json(game_state)
 
 
 def game_start_new(current_players_index: int):

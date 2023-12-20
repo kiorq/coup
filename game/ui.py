@@ -14,14 +14,14 @@ def ui_status_text(game_state: GameState) -> str:
     if winning_player_index is not None:
         return f"Player {winning_player_index + 1}'s WINS 🎉"
 
+    if game_state.turn_ended:
+        return f"Player {player_num}'s turn ended 🎉"
+
     if game_state.current_player_index == 0 and not game_state.current_action:
         return "Your Turn. Choose an action!"
 
     if not game_state.current_action:
         return f"Player {player_num}'s turn"
-    
-    if game_state.turn_ended:
-        return f"Player {player_num} turn has ended"
 
     if not game_state.challenge and not game_state.block:
         return f"Player {player_num} Move: {game_state.current_action.action}!".title()
@@ -64,10 +64,21 @@ def ui_available_actions(game_state: GameState) -> list[dict]:
     return actions
 
 
-def ui_should_automate(game_state: GameState) -> bool:
+def ui_can_automate(game_state: GameState) -> bool:
     if game_state.current_player_index == 0 and game_state.turn_ended:
         return True
     return game_state.current_player_index != 0
+
+
+def ui_can_challenge(game_state: GameState) -> bool:
+    return game_state.current_player_index != 0 \
+        and game_state.current_player \
+            and not game_state.challenge
+
+def ui_can_block(game_state: GameState) -> bool:
+    return game_state.current_player_index != 0 \
+        and game_state.current_player \
+            and not game_state.block
 
 
 def game_ui_state_json(game_state: GameState) -> dict:
@@ -75,6 +86,9 @@ def game_ui_state_json(game_state: GameState) -> dict:
     return {
         "status_text": ui_status_text(game_state),
         "available_actions": ui_available_actions(game_state),
-        "can_automate": ui_should_automate(game_state)
+        "can_automate": ui_can_automate(game_state),
+        "turn_ended": game_state.turn_ended,
+        "can_challenge": ui_can_challenge(game_state),
+        "can_block": ui_can_block(game_state)
     }
 

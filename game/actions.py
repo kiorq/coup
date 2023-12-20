@@ -30,7 +30,7 @@ class Action(object):
         self.targeted_player_index = targeted_player_index
 
     def get_targeted_player(self):
-        if self.targeted_player_index:
+        if self.targeted_player_index is not None:
             targeted_player = self.game_state.players[self.targeted_player_index]
             if targeted_player.is_exiled:
                 raise GameError("Cannot target exiled player")
@@ -123,7 +123,7 @@ class AssassinateAction(Action):
     def resolve(self):
         targeted_player = self.get_targeted_player()
         if not targeted_player:
-            raise GameError("Requires a targeted player")
+            raise GameError("Assassinate requires a targeted player")
         # targeted player looses influence
         targeted_player.loose_influence()
 
@@ -139,7 +139,7 @@ class StealAction(Action):
     def resolve(self):
         targeted_player = self.get_targeted_player()
         if not targeted_player:
-            raise GameError("Requires a targeted player")
+            raise GameError("Steal requires a targeted player")
         # steal 1 coin from targeted player
         if targeted_player.coins == 1:
             targeted_player.coins -= 1
@@ -148,7 +148,7 @@ class StealAction(Action):
             targeted_player.coins -= 2
             self.game_state.current_player.coins += 2
         else:
-            raise GameError("Targeted player does not have any coins")
+            raise GameError("Targeted player does not have enough coins to steel")
 
 
 
