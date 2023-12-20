@@ -88,9 +88,6 @@ class CoupAction(Action):
         else:
             raise GameError("Player does not have enough coins")
 
-
-
-
     def resolve(self):
         targeted_player = self.get_targeted_player()
         if not targeted_player:
@@ -160,27 +157,6 @@ class StealAction(Action):
 #     action = "exchange"
 
 
-# Mapping of action names to action classes
-AVAILABLE_ACTIONS: dict[str, type[Action]] = {
-    "income": IncomeAction,
-    "foreign_aid": ForeignAidAction,
-    "coup": CoupAction,
-    "tax": TaxAction,
-    "assassinate": AssassinateAction,
-    "steal": StealAction,
-    # "exchange": ExchangeAction
-}
-
-def get_action_by_name(action_name: str, **kwargs) -> Action:
-    """Retrieve an action class by name."""
-    if action_name not in AVAILABLE_ACTIONS.keys():
-        raise GameError("Action %s does not exist" % action_name)
-    return AVAILABLE_ACTIONS[action_name](**kwargs)
-
-def get_random_action(**kwargs) -> Action:
-    """Retrieve an random action."""
-    return choice(list(AVAILABLE_ACTIONS.values()))(**kwargs)
-
 class ActionChallenge(object):
 
     challening_player_index: int
@@ -218,3 +194,21 @@ class ActionBlock(object):
     @property
     def is_undetermined(self):
         return self.status == ActionChallenge.Status.Undetermined
+
+
+# Mapping of action names to action classes
+AVAILABLE_ACTIONS: dict[str, type[Action]] = {
+    "income": IncomeAction,
+    "foreign_aid": ForeignAidAction,
+    "coup": CoupAction,
+    "tax": TaxAction,
+    "assassinate": AssassinateAction,
+    "steal": StealAction,
+    # "exchange": ExchangeAction
+}
+
+def get_action_by_name(action_name: str, **kwargs) -> Action:
+    """Retrieve an action class by name."""
+    if action_name not in AVAILABLE_ACTIONS.keys():
+        raise GameError("Action %s does not exist" % action_name)
+    return AVAILABLE_ACTIONS[action_name](**kwargs)

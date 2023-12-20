@@ -1,7 +1,7 @@
 from typing import Union
 from game.actions import AVAILABLE_ACTIONS, Action, ActionBlock, ActionChallenge, Treasury, get_action_by_name
 from game.cards import CourtDeck, cards_from_names
-from game.player import Player
+from game.player import Player, PlayerWithAutomation
 from game.game import GameState
 
 
@@ -66,7 +66,7 @@ def ui_status_text(game_state: GameState) -> str:
 
     if not game_state.challenge and not game_state.block:
         return f"Player {player_num} Move: {game_state.current_action.action}!".title()
-    
+
     if game_state.block:
         blocking_player_num = game_state.block.blocking_player_index + 1
         if game_state.block.is_undetermined:
@@ -150,11 +150,19 @@ def game_state_from_json(data: dict) -> GameState:
             player.take_cards(court_deck, amount=2)
             players.append(player)
     else:
-        players = [Player(
-            coins=player["coins"],
-            cards=cards_from_names(player["cards"]),
-            revealed_cards=cards_from_names(player["revealed_cards"])
-        ) for player in players_from_db]
+        player_1_data = players_from_db.pop(0)
+        player_1 = Player(
+            coins=player_1_data["coins"],
+            cards=cards_from_names(player_1_data["cards"]),
+            revealed_cards=cards_from_names(player_1_data["revealed_cards"])
+        )
+        players = [player_1] + [
+            PlayerWithAutomation(
+                coins=player["coins"],
+                cards=cards_from_names(player["cards"]),
+                revealed_cards=cards_from_names(player["revealed_cards"])
+            ) for player in players_from_db
+        ]
 
     # challenge
     challenge_from_db = data.get("challenge")

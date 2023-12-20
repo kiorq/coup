@@ -1,7 +1,7 @@
 
 from random import choice
 from typing import Union
-from game.actions import ActionBlock, ActionChallenge, get_action_by_name, get_random_action
+from game.actions import ActionBlock, ActionChallenge, get_action_by_name
 from game.errors import GameError
 from web.models.game import store_game_data, retrieve_game_data
 from game.game import GameState
@@ -91,13 +91,8 @@ def automate_next_move():
         raise GameError("Cannot skip your turn")
 
     # handle selecting action
-    targeted_player_index = choice(game_state.get_active_player_indexes())
-
     if not game_state.current_action:
-        targeted_player_index = choice(game_state.get_active_player_indexes())
-        action = get_random_action(
-            targeted_player_index=targeted_player_index
-        )
+        action = game_state.current_player.next_move(game_state.players)
         game_state.perform_action(action)
         return store_game_state(game_state)
 

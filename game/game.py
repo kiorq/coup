@@ -43,16 +43,12 @@ class GameState(object):
     def current_player(self):
         return self.players[self.current_player_index]
 
-    def get_active_players(self):
-        return [player for player in self.players if not player.is_exiled]
-
-    def get_active_player_indexes(self):
-        return [player_index for player_index, player in enumerate(self.players) if not player.is_exiled]
-
     def get_winning_player(self):
-        active_players = self.get_active_players()
-        if len(active_players) == 1:
-            return self.players.index(active_players[0]) # absolutely horrible
+        active_players_indexes = [player_index \
+                                  for player_index, player in enumerate(self.players) \
+                                  if not player.is_exiled]
+        if len(active_players_indexes) == 1:
+            return active_players_indexes[0]
         return None
 
     def perform_action(self, action: Action):
@@ -151,7 +147,7 @@ class GameState(object):
         """
             asks each player if they want to challenge action
         """
-        if not self.challenge:
+        if not self.challenge and self.current_action:
             for player_index, player in enumerate(self.players):
                 if player_index == self.current_player_index:
                     # current player cannot challenge themself
@@ -161,7 +157,7 @@ class GameState(object):
                     # user is can no longer play
                     continue
 
-                if player.request_challenge():
+                if player.request_challenge(self.current_action):
                     self.challenge = ActionChallenge(
                         challening_player_index=player_index,
                     )
@@ -203,7 +199,7 @@ class GameState(object):
         """
             asks each player if they want to block action
         """
-        if not self.block:
+        if not self.block and self.current_action:
             for player_index, player in enumerate(self.players):
                 if player_index == self.current_player_index:
                     # current player cannot challenge themself
@@ -213,7 +209,7 @@ class GameState(object):
                     # user is can no longer play
                     continue
 
-                if player.request_block():
+                if player.request_block(self.current_action):
                     self.block = ActionBlock(
                         blocking_player_index=player_index,
                     )
@@ -240,7 +236,7 @@ class GameState(object):
             blocking_player = self.players[self.block.blocking_player_index]
             blocking_player_card = blocking_player.has_cards(self.current_action.is_blockably_by)
             blocking_player_is_bluffing = not bool(blocking_player_card)
-            blocking_player_will_show = blocking_player.request_will_show()
+            blocking_player_will_show = blocking_player.request_will_show(self.current_action)
 
             # blocking player is bluffing or does not want to show
             if blocking_player_is_bluffing or not blocking_player_will_show:
